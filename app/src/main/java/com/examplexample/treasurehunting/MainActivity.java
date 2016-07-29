@@ -3,6 +3,8 @@ package com.examplexample.treasurehunting;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,9 +15,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import android.app.FragmentTransaction;
 
 
 public class MainActivity extends AppCompatActivity
@@ -26,9 +28,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+                SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+        fragmentManager.beginTransaction().replace(R.id.flContent, mapFragment).commit();
+
+//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+//                .findFragmentById(R.id.map);
+//        mapFragment.getMapAsync(this);
 
 
 
@@ -91,17 +97,36 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Fragment fragment = null;
+        Class fragmentClass;
 
         if (id == R.id.map_page) {
             // Handle the map action
+            fragmentClass = SupportMapFragment.class;
 
         } else if (id == R.id.step_counter) {
-
+            fragmentClass = BlankFragment.class;
         } else if (id == R.id.information) {
+            fragmentClass = BlankFragment.class;
+        } else  {
+            fragmentClass = BlankFragment.class;
+        }
 
-        } else if (id == R.id.setting) {
+        try {
+
+            fragment = (Fragment) fragmentClass.newInstance();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
 
         }
+
+
+
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -114,6 +139,5 @@ public class MainActivity extends AppCompatActivity
                 .position(new LatLng(0, 0))
                 .title("Marker"));
     }
-
 
 }
