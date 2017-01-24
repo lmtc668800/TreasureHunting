@@ -8,19 +8,29 @@
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent" />
 
-    <SlidingDrawer
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/steps"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textStyle="normal|bold"
+        android:textSize="24sp" />
+
+    <com.examplexample.treasurehunting.WrappingSlidingDrawer
         android:id="@+id/slidingDrawer1"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:content="@+id/content"
-        android:handle="@+id/handle" >
+        android:handle="@+id/handle"
+        android:layout_alignParentBottom="true">
 
         <Button
             android:id="@+id/handle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#2299FF"
-            android:text="Menu"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/round_button"
             />
 
 
@@ -31,7 +41,7 @@
 
             android:layout_height="fill_parent"
 
-            android:background="#F3F3AF">
+            android:background="#283492">
 
             <Button
 
@@ -41,7 +51,18 @@
 
                 android:layout_height="wrap_content"
 
-                android:text="Hints"
+                android:text="NEW GAME"
+
+                />
+            <Button
+
+                android:id="@+id/button2"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="HINTS"
 
                 />
 
@@ -53,24 +74,25 @@
 
                 android:layout_height="wrap_content"
 
-                android:text="New Game"
+                android:text="SHOP"
+
+                android:elevation="0dp" />
+            <Button
+
+                android:id="@+id/button4"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="HELP"
 
                 />
 
 
         </LinearLayout>
 
-    </SlidingDrawer>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/steps"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textStyle="normal|bold"
-        android:textSize="24sp" />
+    </com.examplexample.treasurehunting.WrappingSlidingDrawer>
 </RelativeLayout>
 
 <!--<android.support.v4.widget.DrawerLayout-->

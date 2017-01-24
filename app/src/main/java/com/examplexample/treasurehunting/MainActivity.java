@@ -16,6 +16,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
 import android.view.View;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
@@ -26,7 +28,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +55,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+
+import android.util.TypedValue;
+
+import org.w3c.dom.Text;
 
 
 public class MainActivity extends AppCompatActivity
@@ -73,7 +83,7 @@ public class MainActivity extends AppCompatActivity
     Marker spot2;
     Marker spot3;
     List checked = new ArrayList();
-    final static double scan_range=0.080;
+    final static double scan_range=3.080;
 //    Marker treasure;
 
 
@@ -102,12 +112,27 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        final SlidingDrawer slidingDrawer = (SlidingDrawer) findViewById(R.id.slidingDrawer1);
+
+
+
+//        final SlidingDrawer slidingDrawer = (SlidingDrawer) findViewById(R.id.slidingDrawer1);
+        final WrappingSlidingDrawer slidingDrawer = (WrappingSlidingDrawer) findViewById(R.id.slidingDrawer1);
         slidingDrawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener(){
             @Override
             public void onDrawerOpened() {
+
                 Button button1 = (Button) findViewById(R.id.button1);
                 button1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startNewGame();
+                        slidingDrawer.close();
+
+                    }
+                });
+
+                Button button2 = (Button) findViewById(R.id.button2);
+                button2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent();
@@ -126,13 +151,38 @@ public class MainActivity extends AppCompatActivity
                 button3.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        startNewGame();
+                        String hint1 = "Locked";
+                        String hint2 = "Locked";
+                        String hint3 = "Locked";
+                        String hint4 = "Locked";
+                        String hint5 = "Locked";
+                        new AlertDialog.Builder(MainActivity.this).setTitle("HINTS").setItems(
+                                new String[] { hint1, hint2,hint3,hint4,hint5 }, null).setNegativeButton(
+                                "OKay", null).show();
                         slidingDrawer.close();
 
                     }
                 });
+
+
+                Button button4 = (Button) findViewById(R.id.button4);
+                button4.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        showDetailInfo("button4");
+                        slidingDrawer.close();
+
+                    }
+                });
+
             }
         });
+
+
+
+
+
+
 
 //        fragmentManager.beginTransaction().replace(R.id.flContent, mapFragment).commit();
 
@@ -331,6 +381,7 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(getApplicationContext(), "Congratulation! You find the treasure in"+ currentSteps+"steps", Toast.LENGTH_LONG).show();
                 }else{
                     Toast.makeText(getApplicationContext(), "You got a new hint! Check it now!", Toast.LENGTH_LONG).show();
+                    showDetailInfo(inf);
                     hintNumber++;
                 }
             }
@@ -422,6 +473,44 @@ public class MainActivity extends AppCompatActivity
         checked.clear();
     }
 
+    private void showDetailInfo(String id){
+        final PopupWindow mPopupWindow = new PopupWindow(MainActivity.this);
+
+        // レイアウト設定
+        View popupView = getLayoutInflater().inflate(R.layout.popup_layout, null);
+
+        TextView spotName = (TextView) popupView.findViewById(R.id.spot_name);
+        TextView spotInfo = (TextView) popupView.findViewById(R.id.spot_info);
+        spotName.setText(id);
+        spotInfo.setText(id + "information");
+        popupView.findViewById(R.id.close_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mPopupWindow.isShowing()) {
+                    mPopupWindow.dismiss();
+                }
+            }
+        });
+        mPopupWindow.setContentView(popupView);
+
+
+        // 背景設定
+        mPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_background));
+
+        // タップ時に他のViewでキャッチされないための設定
+        mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.setFocusable(true);
+
+        // 表示サイズの設定 今回は幅300dp
+        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics());
+        mPopupWindow.setWindowLayoutMode((int) width, WindowManager.LayoutParams.WRAP_CONTENT);
+        mPopupWindow.setWidth((int) width);
+        mPopupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+
+        // 画面中央に表示
+        mPopupWindow.showAtLocation(findViewById(R.id.map), Gravity.CENTER, 0, 0);
+    }
+
 
 
     @Override
@@ -464,6 +553,8 @@ public class MainActivity extends AppCompatActivity
         mSensorManager.unregisterListener(this, mStepCounterSensor);
         mSensorManager.unregisterListener(this,mStepDetectorSensor);
     }
+
+
 
 
 }
