@@ -6,7 +6,8 @@
         android:id="@+id/map"
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent" />
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -85,7 +86,7 @@
 
                 android:layout_height="wrap_content"
 
-                android:text="HELP"
+                android:text="EXIT"
 
                 />
 
@@ -93,48 +94,26 @@
         </LinearLayout>
 
     </com.examplexample.treasurehunting.WrappingSlidingDrawer>
+
+    <TextView
+        android:textSize="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/coins_text_main"
+        android:layout_below="@+id/steps"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:text="+"
+        android:background="@drawable/round_button"
+        android:id="@+id/purchase_main"
+        android:layout_alignBottom="@+id/coins_text_main"
+        android:layout_toRightOf="@+id/coins_text_main"
+        android:layout_toEndOf="@+id/coins_text_main"
+        android:layout_marginLeft="9dp"
+        android:layout_marginStart="9dp" />
 </RelativeLayout>
 
-<!--<android.support.v4.widget.DrawerLayout-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--xmlns:tools="http://schemas.android.com/tools"-->
-    <!--android:id="@+id/drawer_layout"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:fitsSystemWindows="true"-->
-    <!--tools:openDrawer="start">-->
-
-
-    <!--<include-->
-        <!--layout="@layout/app_bar_main"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent" />-->
-
-    <!--<android.support.design.widget.NavigationView-->
-        <!--android:id="@+id/nav_view"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_gravity="start"-->
-        <!--android:fitsSystemWindows="true"-->
-        <!--app:headerLayout="@layout/nav_header_main"-->
-        <!--app:menu="@menu/activity_main_drawer" >-->
-
-    <!--</android.support.design.widget.NavigationView>-->
-
-
-<!--</android.support.v4.widget.DrawerLayout>-->
-<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:id="@+id/layout">-->
-
-    <!--<fragment-->
-        <!--android:id="@+id/map"-->
-        <!--class="com.google.android.gms.maps.SupportMapFragment"-->
-        <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent" />-->
-
-
-
-<!--</FrameLayout>-->

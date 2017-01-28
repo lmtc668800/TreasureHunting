@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_master"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@drawable/shinjuku01"
+    tools:context="com.examplexample.treasurehunting.MasterActivity">
+
+    <Button
+        android:text="Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="56dp"
+        android:layout_marginStart="56dp"
+        android:id="@+id/shinjuku"
+        android:layout_alignBaseline="@+id/waseda"
+        android:layout_alignBottom="@+id/waseda"
+        android:layout_toRightOf="@+id/waseda"
+        android:layout_toEndOf="@+id/waseda"
+        android:background="#FF4500" />
+
+    <Button
+        android:id="@+id/purchase"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:text="+"
+        android:background="@drawable/round_button"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="66dp"
+        android:layout_marginEnd="66dp" />
+
+    <TextView
+        android:text=""
+        android:textColor="#FFFFFF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/handle"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/coinsText" />
+
+    <Button
+        android:text="Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="51dp"
+        android:layout_marginStart="51dp"
+        android:id="@+id/waseda"
+        android:layout_marginBottom="98dp"
+        android:background="@drawable/side_nav_bar"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Unlock"
+        android:textSize="10dp"
+        android:background="#AABB00"
+        android:layout_width="wrap_content"
+        android:id="@+id/unlock"
+        android:layout_above="@+id/shinjuku"
+        android:layout_alignLeft="@+id/shinjuku"
+        android:layout_alignStart="@+id/shinjuku"
+        android:layout_height="30dp" />
+</RelativeLayout>
