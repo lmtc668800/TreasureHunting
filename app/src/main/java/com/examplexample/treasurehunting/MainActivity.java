@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity
 
 
     List checked = new ArrayList();
-    final static double scan_range=13.080;
+    static double scan_range=0.030;
 //    Marker treasure;
 
 
@@ -132,11 +132,15 @@ public class MainActivity extends AppCompatActivity
 
     int unlockedGame = 0;
     int coins=0;
+    int stage=0;
 
     List<SpotData> gameData;
     List<String> hintData;
 
     TextView coinText;
+    TextView steps;
+
+    LatLng startPoint;
 
 
     @Override
@@ -147,14 +151,23 @@ public class MainActivity extends AppCompatActivity
         Bundle bundle = this.getIntent().getExtras();
         coins = bundle.getInt("coins");
         unlockedGame = bundle.getInt("unlockedGame");
+        stage = bundle.getInt("stage");
 
         coinText= (TextView) findViewById(R.id.coins_text_main);
         coinText.setText("Coins: " + coins);
+        steps=(TextView) this.findViewById(R.id.steps);
+        steps.setText( "0 steps");
 
 
         DataLoader dataLoader = new DataLoader();
         gameData = dataLoader.LoadIn();
         hintData = dataLoader.LoadHints();
+
+        gps = new GPSTracker(MainActivity.this);
+        latitude = gps.getLatitude();
+        longitude = gps.getLongitude();
+
+        startPoint = new LatLng(35.692164,139.701101);
 
 
 
@@ -183,7 +196,17 @@ public class MainActivity extends AppCompatActivity
                 button1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        startNewGame();
+                        if(stage == 1){
+                            double distance;
+                            distance = loC.distance(latitude, longitude, startPoint.latitude, startPoint.longitude, "K");
+                            if (distance<= 0.030){
+                                startNewGame();
+                            }else{
+                                Toast.makeText(getApplicationContext(), "Please start at the circle area in the map.", Toast.LENGTH_LONG).show();
+                            }
+                        }else {
+                            startNewGame();
+                        }
                         slidingDrawer.close();
 
                     }
@@ -211,8 +234,31 @@ public class MainActivity extends AppCompatActivity
                 button3.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        if (gameStarted ==1) {
+                            new AlertDialog.Builder(MainActivity.this).setTitle("SHOP").setItems(
+                                    new String[]{"Unlock a hint(5 coins)", "Master mode"}, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int which) {
+                                            if (which == 0) {
+                                                if (coins >= 5) {
+                                                    coins = coins - 5;
+                                                    hintNumber++;
+                                                    coinText.setText("Coins: " + coins);
+                                                } else {
+                                                    Toast.makeText(getApplicationContext(), "Failed. Insufficient coins", Toast.LENGTH_LONG).show();
+                                                }
+                                            } else if (which == 1) {
+                                                scan_range = scan_range + 10;
+                                            }
 
-                        slidingDrawer.close();
+                                        }
+                                    }).setNegativeButton(
+                                    "Cancel", null).show();
+
+                            slidingDrawer.close();
+                        }else {
+                            Toast.makeText(getApplicationContext(), "You can only visit the shop after game started.", Toast.LENGTH_LONG).show();
+                        }
 
                     }
                 });
@@ -546,20 +592,18 @@ public class MainActivity extends AppCompatActivity
 
 
 
-//        CircleOptions circleOptions = new CircleOptions()
-//                .center(bld51)
-//                .radius(50)
-//                .strokeWidth(5);
+        CircleOptions circleOptions = new CircleOptions()
+                .center(startPoint)
+                .radius(30)
+                .strokeWidth(5);
 
-// Get back the mutable Circle
-//        Circle circle = map.addCircle(circleOptions);
+        Circle circle = map.addCircle(circleOptions);
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
                 String inf = marker.getId();
                 showDetailInfo(inf);
-
 
 //                if (inf.equals("m0")){
 //                    Toast.makeText(getApplicationContext(), "Congratulation! You find the treasure in"+ currentSteps+"steps", Toast.LENGTH_LONG).show();
@@ -587,9 +631,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onMyLocationButtonClick() {
-        gps = new GPSTracker(MainActivity.this);
-        latitude = gps.getLatitude();
-        longitude = gps.getLongitude();
 
 
         double distance;
@@ -836,12 +877,12 @@ public class MainActivity extends AppCompatActivity
 
     private void startNewGame(){
         Toast.makeText(getApplicationContext(), "Start new game", Toast.LENGTH_LONG).show();
-        TextView steps=(TextView) this.findViewById(R.id.steps);
         steps.setText("0 steps");
         stepSetZero = stepSetZero + currentSteps;
         currentSteps = 0;
         hintNumber =1;
         gameStarted =1;
+        scan_range=0.030;
         checked.clear();
     }
 
@@ -1009,9 +1050,9 @@ public class MainActivity extends AppCompatActivity
         //TYPE_STEP_COUNTER
         if (sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
             // sensor からの値を取得するなどの処理を行う
-            TextView steps=(TextView) this.findViewById(R.id.steps);
             currentSteps = (int)values[0]-stepSetZero;
-            steps.setText(currentSteps + " steps");
+                steps.setText(currentSteps + " steps");
+
         }
 
 

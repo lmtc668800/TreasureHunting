@@ -29,7 +29,7 @@ public class MasterActivity extends AppCompatActivity {
         unlockedGame = bundle.getInt("unlockedGame");
 
         final TextView coinText= (TextView) findViewById(R.id.coinsText);
-        coinText.setText("Coins: " + coins);
+        coinText.setText("COINS: " + coins);
 
 
 
@@ -43,6 +43,7 @@ public class MasterActivity extends AppCompatActivity {
                 Bundle bundle=new Bundle();
                 bundle.putInt("coins",coins);
                 bundle.putInt("unlockedGame",unlockedGame);
+                bundle.putInt("stage",0);
                 intent.putExtras(bundle);
 
                 startActivity(intent);
@@ -51,7 +52,10 @@ public class MasterActivity extends AppCompatActivity {
 
         final Button button2 = (Button) findViewById(R.id.shinjuku);
         if (unlockedGame<2){
-            button2.setBackgroundColor(Color.GRAY);
+            button2.setBackgroundColor(Color.parseColor("#70BFBFBF"));
+        }else{
+            button2.setText("Shinjuku");
+            button2.setBackgroundColor(Color.parseColor("#b0FFAA00"));
         }
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,49 +67,39 @@ public class MasterActivity extends AppCompatActivity {
                     Bundle bundle = new Bundle();
                     bundle.putInt("coins",coins);
                     bundle.putInt("unlockedGame", unlockedGame);
+                    bundle.putInt("stage",1);
                     intent.putExtras(bundle);
 
                     startActivity(intent);
                 }else{
-                    Toast.makeText(getApplicationContext(), "You need to unlock this stage", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+                    new AlertDialog.Builder(MasterActivity.this).setTitle("Locked Stage")
+                            .setMessage("This stage is locked. Do you want to unlock it?(require 50 coins)")
+                            .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
 
-        final Button button3 = (Button) findViewById(R.id.unlock);
-        if (unlockedGame>=2){
-            button3.setVisibility(View.INVISIBLE);
-        }
-        button3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (coins >= 50){
+                                        coins = coins -50;
+                                        unlockedGame++;
+//                                        button3.setVisibility(View.INVISIBLE);
+                                        coinText.setText("COINS: " + coins);
+                                        button2.setText("Shinjuku");
+                                        button2.setBackgroundColor(Color.parseColor("#b0FFAA00"));
+                                    }else {
+                                        Toast.makeText(getApplicationContext(), "Failed. Insufficient coins.", Toast.LENGTH_LONG).show();
+                                    }
 
-                new AlertDialog.Builder(MasterActivity.this).setTitle("Unclock new stage")
-                        .setMessage("Do you want to unlock a new stage?(require 50 coins)")
-                        .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (coins >= 50){
-                                    coins = coins -50;
-                                    unlockedGame++;
-                                    button3.setVisibility(View.INVISIBLE);
-                                    coinText.setText("Coins: " + coins);
-                                }else {
-                                    Toast.makeText(getApplicationContext(), "Failed. Insufficient coins", Toast.LENGTH_LONG).show();
                                 }
-                                button2.setBackgroundColor(Color.argb(255,255,69,0));
 
-                            }
+                            }).setNegativeButton("No",new DialogInterface.OnClickListener() {
 
-                        }).setNegativeButton("No",new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                        }
 
-                    }
-
-                }).show();
+                    }).show();
+                }
             }
         });
 

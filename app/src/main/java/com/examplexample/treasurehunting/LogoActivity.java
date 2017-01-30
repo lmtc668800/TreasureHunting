@@ -15,7 +15,7 @@ public class LogoActivity extends AppCompatActivity {
         intent.setClass(LogoActivity.this, MasterActivity.class);
 
         Bundle bundle=new Bundle();
-        bundle.putInt("coins",50);
+        bundle.putInt("coins",49);
         bundle.putInt("unlockedGame",1);
         intent.putExtras(bundle);
 
