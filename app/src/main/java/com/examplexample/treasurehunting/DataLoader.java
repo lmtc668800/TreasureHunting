@@ -17,17 +17,17 @@ public class DataLoader {
 
 
 //Bonus type:0->gold 1->Hint 2->SmallHint 3->treasure
-        SpotData spot1 = new SpotData("花園神社",35.693557,139.705169,"description",0,"hint");
-        SpotData spot2 = new SpotData("TOHOシネマズ新宿",35.695415,139.702055,"description",1,"hint");
+        SpotData spot1 = new SpotData("花園神社",35.693436,139.705262,"description description description descriptiondescription",0,"hint");
+        SpotData spot2 = new SpotData("TOHOシネマズ新宿",35.695100,139.701690,"description",1,"hint");
         SpotData spot3 = new SpotData("新宿ピカデリー",35.692676,139.703616,"description",1,"hint");
-        SpotData spot4 = new SpotData("歌舞伎町",35.694937,139.702861,"description",2,"hint");
+        SpotData spot4 = new SpotData("歌舞伎町",35.694887,139.702928,"description",2,"hint");
         SpotData spot5 = new SpotData("新宿野村ビル",35.693014,139.695375,"description",0,"hint");
-        SpotData spot6 = new SpotData("東京モード学園",35.691529,139.696872,"description",0,"hint");
-        SpotData spot7 = new SpotData("ヤマダ電機 LABI新宿東口館",35.693320,139.700820,"description",0,"hint");
-        SpotData spot8 = new SpotData("伊勢丹 新宿店",35.691637,139.704616,"description",0,"hint");
+        SpotData spot6 = new SpotData("東京モード学園",35.691529,139.696872,"description",1,"hint");
+        SpotData spot7 = new SpotData("ヤマダ電機 LABI新宿東口館",35.693481,139.700824,"description",0,"hint");
+        SpotData spot8 = new SpotData("伊勢丹 新宿店",35.691929,139.704283,"description",0,"hint");
         SpotData spot9 = new SpotData("Kirin City キリンシティプラス新宿東南口",35.690357,139.701309,"description",0,"hint");
         SpotData spot10 = new SpotData("小田急百貨店 新宿店",35.691322,139.699558,"description",0,"hint");
-        SpotData spot11 = new SpotData("紀伊国屋書店新宿本店",35.692233,139.703012,"description",0,"hint");
+        SpotData spot11 = new SpotData("紀伊国屋書店新宿本店",35.691911,139.702804,"description",0,"hint");
         SpotData spot12 = new SpotData("新宿プリンスホテル",35.694531,139.700161,"description",0,"hint");
         SpotData spot13 = new SpotData("スターバックスコーヒー 新宿新南口店",35.688886,139.702420,"description",0,"hint");
         SpotData spot14 = new SpotData("ビームス 新宿",35.691458,139.701122,"description",0,"hint");
@@ -38,7 +38,7 @@ public class DataLoader {
         SpotData spot19 = new SpotData("三菱東京UFJ銀行 新宿通支店",35.690688,139.704508,"description",0,"hint");
         SpotData spot20 = new SpotData("ファミリーマート 新宿損保ジャパン店",35.693045,139.696550,"description",0,"hint");
         SpotData spot21 = new SpotData("新宿ミロード",35.689370,139.699785,"description",0,"hint");
-        SpotData spot22 = new SpotData("新宿バルト9",35.690053,139.705803,"description",0,"hint");
+        SpotData spot22 = new SpotData("新宿バルト9",35.690269,139.705781,"description",1,"hint");
         SpotData spot23 = new SpotData("新宿区役所 本庁舎",35.693805,139.703463,"description",0,"hint");
         SpotData spot24 = new SpotData("K’s　cinema",35.690143,139.702769,"description",3,"hint");
         SpotData spot25 = new SpotData("ブルーボトルコーヒー 新宿カフェ",35.688809,139.702068,"description",0,"hint");

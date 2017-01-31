@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity
 
 
     List checked = new ArrayList();
-    static double scan_range=0.030;
+    static double scan_range=0.040;
 //    Marker treasure;
 
 
@@ -168,8 +168,7 @@ public class MainActivity extends AppCompatActivity
         longitude = gps.getLongitude();
 
         startPoint = new LatLng(35.692164,139.701101);
-
-
+//        startPoint = new LatLng(35.709781,139.693517);
 
 
 //        FragmentManager fragmentManager = getSupportFragmentManager();
@@ -179,6 +178,8 @@ public class MainActivity extends AppCompatActivity
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
 
 
 
@@ -199,7 +200,8 @@ public class MainActivity extends AppCompatActivity
                         if(stage == 1){
                             double distance;
                             distance = loC.distance(latitude, longitude, startPoint.latitude, startPoint.longitude, "K");
-                            if (distance<= 0.030){
+                            Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
+                            if (distance<= 0.060){
                                 startNewGame();
                             }else{
                                 Toast.makeText(getApplicationContext(), "Please start at the circle area in the map.", Toast.LENGTH_LONG).show();
@@ -236,7 +238,7 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(View view) {
                         if (gameStarted ==1) {
                             new AlertDialog.Builder(MainActivity.this).setTitle("SHOP").setItems(
-                                    new String[]{"Unlock a hint(5 coins)", "Master mode"}, new DialogInterface.OnClickListener() {
+                                    new String[]{"Unlock a hint(5 coins)", "Master mode on", "Master mode off"}, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int which) {
                                             if (which == 0) {
@@ -249,6 +251,8 @@ public class MainActivity extends AppCompatActivity
                                                 }
                                             } else if (which == 1) {
                                                 scan_range = scan_range + 10;
+                                            } else if (which == 2){
+                                                scan_range = 0.040;
                                             }
 
                                         }
@@ -592,12 +596,19 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        CircleOptions circleOptions = new CircleOptions()
+        CircleOptions circleOptions1 = new CircleOptions()
                 .center(startPoint)
-                .radius(30)
-                .strokeWidth(5);
+                .radius(40)
+                .strokeWidth(2)
+                .fillColor(Color.parseColor("#a0EAEFEA"));
 
-        Circle circle = map.addCircle(circleOptions);
+        CircleOptions circleOptions2 = new CircleOptions()
+                .center(startPoint)
+                .radius(600)
+                .strokeWidth(5)
+                .strokeColor(Color.parseColor("#f0AACC44"));
+        Circle circle1 = map.addCircle(circleOptions1);
+        Circle circle2 = map.addCircle(circleOptions2);
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
@@ -634,6 +645,9 @@ public class MainActivity extends AppCompatActivity
 
 
         double distance;
+        gps = new GPSTracker(MainActivity.this);
+        latitude = gps.getLatitude();
+        longitude = gps.getLongitude();
 
         if(gameStarted == 1) {
 
@@ -646,7 +660,7 @@ public class MainActivity extends AppCompatActivity
 
 
                 distance = loC.distance(latitude, longitude, spot2.getPosition().latitude, spot2.getPosition().longitude, "K");
-                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot2.setVisible(false);
                 } else {
@@ -656,7 +670,6 @@ public class MainActivity extends AppCompatActivity
 
 
                 distance = loC.distance(latitude, longitude, spot3.getPosition().latitude, spot3.getPosition().longitude, "K");
-                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot3.setVisible(false);
                 } else {
@@ -664,8 +677,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
+                distance = loC.distance(latitude, longitude, spot4.getPosition().latitude, spot4.getPosition().longitude, "K");
                 if (distance >= scan_range) {
                     spot4.setVisible(false);
                 } else {
@@ -673,8 +685,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
+                distance = loC.distance(latitude, longitude, spot5.getPosition().latitude, spot5.getPosition().longitude, "K");
                 if (distance >= scan_range) {
                     spot5.setVisible(false);
                 } else {
@@ -682,8 +693,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
+                distance = loC.distance(latitude, longitude, spot6.getPosition().latitude, spot6.getPosition().longitude, "K");
                 if (distance >= scan_range) {
                     spot6.setVisible(false);
                 } else {
@@ -691,8 +701,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
+                distance = loC.distance(latitude, longitude, spot7.getPosition().latitude, spot7.getPosition().longitude, "K");
                 if (distance >= scan_range) {
                     spot7.setVisible(false);
                 } else {
@@ -700,15 +709,14 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
+                distance = loC.distance(latitude, longitude, spot8.getPosition().latitude, spot8.getPosition().longitude, "K");
                 if (distance >= scan_range) {
                     spot8.setVisible(false);
                 } else {
                     spot8.setVisible(true);
                 }
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot9.getPosition().latitude, spot9.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot9.setVisible(false);
@@ -716,7 +724,7 @@ public class MainActivity extends AppCompatActivity
                     spot9.setVisible(true);
                 }
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot10.getPosition().latitude, spot10.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot10.setVisible(false);
@@ -724,7 +732,7 @@ public class MainActivity extends AppCompatActivity
                     spot10.setVisible(true);
                 }
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot11.getPosition().latitude, spot11.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot11.setVisible(false);
@@ -733,7 +741,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot12.getPosition().latitude, spot12.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot12.setVisible(false);
@@ -742,7 +750,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot13.getPosition().latitude, spot13.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot13.setVisible(false);
@@ -751,7 +759,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot14.getPosition().latitude, spot14.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot14.setVisible(false);
@@ -760,7 +768,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot15.getPosition().latitude, spot15.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot15.setVisible(false);
@@ -769,7 +777,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot16.getPosition().latitude, spot16.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot16.setVisible(false);
@@ -778,7 +786,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot17.getPosition().latitude, spot17.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot17.setVisible(false);
@@ -787,7 +795,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot18.getPosition().latitude, spot18.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot18.setVisible(false);
@@ -796,7 +804,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot19.getPosition().latitude, spot19.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot19.setVisible(false);
@@ -805,7 +813,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot20.getPosition().latitude, spot20.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot20.setVisible(false);
@@ -814,7 +822,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot21.getPosition().latitude, spot21.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot21.setVisible(false);
@@ -823,7 +831,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot22.getPosition().latitude, spot22.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot22.setVisible(false);
@@ -832,7 +840,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot23.getPosition().latitude, spot23.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot23.setVisible(false);
@@ -841,7 +849,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot24.getPosition().latitude, spot24.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot24.setVisible(false);
@@ -850,7 +858,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+                distance = loC.distance(latitude, longitude, spot25.getPosition().latitude, spot25.getPosition().longitude, "K");
 //                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
                 if (distance >= scan_range) {
                     spot25.setVisible(false);
@@ -860,7 +868,7 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
         return false;
@@ -882,7 +890,7 @@ public class MainActivity extends AppCompatActivity
         currentSteps = 0;
         hintNumber =1;
         gameStarted =1;
-        scan_range=0.030;
+        scan_range=0.040;
         checked.clear();
     }
 
@@ -983,9 +991,11 @@ public class MainActivity extends AppCompatActivity
                 case 0:
                     coins = coins + 5;
                     coinText.setText("Coins: " + coins);
+                    Toast.makeText(getApplicationContext(), "You got 5 coins.", Toast.LENGTH_LONG).show();
                     break;
                 case 1:
                     hintNumber++;
+                    Toast.makeText(getApplicationContext(), "You got a new hint! Check it now.", Toast.LENGTH_LONG).show();
                     break;
                 case 2:
                     break;
