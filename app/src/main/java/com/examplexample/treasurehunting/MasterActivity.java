@@ -104,6 +104,19 @@ public class MasterActivity extends AppCompatActivity {
         });
 
 
+        Button button3 = (Button) findViewById(R.id.help);
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new  AlertDialog.Builder(MasterActivity.this)
+                        .setTitle("HELP" )
+                        .setMessage("Here are two stages.\nFor each stage. For each stage, there are several spots which may be a treasure or some bonus helping you to find the Treasure.\n" +
+                                "In each stage, there are two circle on the Map. You need to press 'NEW GAME' button inside the small circle. All of the spots will be inside the large circle." )
+                        .setPositiveButton("OK" ,  null )
+                        .show();
+            }
+        });
+
 
 
 

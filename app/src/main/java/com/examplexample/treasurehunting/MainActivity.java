@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity
 
 
     List checked = new ArrayList();
-    static double scan_range=0.040;
+    static double scan_range=0.060;
 //    Marker treasure;
 
 
@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity
 
     int hintNumber = 0;
     int gameStarted =0;
+    int leftChance =0;
 
     int unlockedGame = 0;
     int coins=0;
@@ -139,8 +140,11 @@ public class MainActivity extends AppCompatActivity
 
     TextView coinText;
     TextView steps;
+    TextView chance;
 
     LatLng startPoint;
+
+//    Circle circle3;
 
 
     @Override
@@ -157,6 +161,8 @@ public class MainActivity extends AppCompatActivity
         coinText.setText("Coins: " + coins);
         steps=(TextView) this.findViewById(R.id.steps);
         steps.setText( "0 steps");
+        chance = (TextView) findViewById(R.id.left_chance);
+        chance.setText("Chance: "+leftChance);
 
 
         DataLoader dataLoader = new DataLoader();
@@ -200,8 +206,8 @@ public class MainActivity extends AppCompatActivity
                         if(stage == 1){
                             double distance;
                             distance = loC.distance(latitude, longitude, startPoint.latitude, startPoint.longitude, "K");
-                            Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                            if (distance<= 0.060){
+//                            Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
+                            if (distance<= 0.040){
                                 startNewGame();
                             }else{
                                 Toast.makeText(getApplicationContext(), "Please start at the circle area in the map.", Toast.LENGTH_LONG).show();
@@ -238,22 +244,28 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(View view) {
                         if (gameStarted ==1) {
                             new AlertDialog.Builder(MainActivity.this).setTitle("SHOP").setItems(
-                                    new String[]{"Unlock a hint(5 coins)", "Master mode on", "Master mode off"}, new DialogInterface.OnClickListener() {
+//                                    new String[]{"Unlock a hint(5 coins)", "Master mode on", "Master mode off"}, new DialogInterface.OnClickListener() {
+
+
+                                    new String[]{"Unlock a hint(5 coins)"}, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int which) {
+
                                             if (which == 0) {
-                                                if (coins >= 5) {
-                                                    coins = coins - 5;
+                                                if (coins >= 10) {
+                                                    coins = coins - 10;
                                                     hintNumber++;
                                                     coinText.setText("Coins: " + coins);
+                                                    Toast.makeText(getApplicationContext(), "A hint unlocked! Check it now!", Toast.LENGTH_LONG).show();
                                                 } else {
                                                     Toast.makeText(getApplicationContext(), "Failed. Insufficient coins", Toast.LENGTH_LONG).show();
                                                 }
-                                            } else if (which == 1) {
-                                                scan_range = scan_range + 10;
-                                            } else if (which == 2){
-                                                scan_range = 0.040;
                                             }
+//                                            else if (which == 1) {
+//                                                scan_range = scan_range + 10;
+//                                            } else if (which == 2){
+//                                                scan_range = 0.060;
+//                                            }
 
                                         }
                                     }).setNegativeButton(
@@ -279,7 +291,6 @@ public class MainActivity extends AppCompatActivity
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         //                        showDetailInfo("button4");
-                                        coins++;
                                         Intent intent = new Intent();
                                         intent.setClass(MainActivity.this, MasterActivity.class);
 
@@ -610,19 +621,57 @@ public class MainActivity extends AppCompatActivity
         Circle circle1 = map.addCircle(circleOptions1);
         Circle circle2 = map.addCircle(circleOptions2);
 
+//        CircleOptions circleOptions3 = new CircleOptions()
+//                .center(new LatLng(latitude,longitude))
+//                .radius(40)
+//                .strokeWidth(3);
+//        circle3 = map.addCircle(circleOptions3);
+
+
+
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
-            public void onInfoWindowClick(Marker marker) {
-                String inf = marker.getId();
+            public void onInfoWindowClick(final Marker marker) {
+                final String inf = marker.getId();
                 showDetailInfo(inf);
 
-//                if (inf.equals("m0")){
-//                    Toast.makeText(getApplicationContext(), "Congratulation! You find the treasure in"+ currentSteps+"steps", Toast.LENGTH_LONG).show();
-//                }else{
-//                    Toast.makeText(getApplicationContext(), "You got a new hint! Check it now!", Toast.LENGTH_LONG).show();
+
+
+
+
+//                new AlertDialog.Builder(MainActivity.this).setTitle("Locked Stage")
+//                        .setMessage("Search for treasure? Get hint?")
+//                        .setPositiveButton("Destination!",new DialogInterface.OnClickListener() {
+//
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                if (inf == "m23"){
+//                                    showDetailInfo(inf);
+//                                }else {
+//                                    Toast.makeText(getApplicationContext(), "Ops. It's not a treasure.", Toast.LENGTH_LONG).show();
+//                                }
+//
+//                            }
+//
+//                        }).setNegativeButton("Get hint",new DialogInterface.OnClickListener() {
+//
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        showDetailInfo(inf);
+//                    }
+//
+//                }).show();
+
+//
+//                double distance;
+//                gps = new GPSTracker(MainActivity.this);
+//                latitude = gps.getLatitude();
+//                longitude = gps.getLongitude();
+//                distance = loC.distance(latitude, longitude, marker.getPosition().latitude, marker.getPosition().longitude, "K");
+//                if (distance <= scan_range){
 //                    showDetailInfo(inf);
-////                    hintNumber++;
 //                }
+
             }
         });
 
@@ -648,6 +697,8 @@ public class MainActivity extends AppCompatActivity
         gps = new GPSTracker(MainActivity.this);
         latitude = gps.getLatitude();
         longitude = gps.getLongitude();
+
+//        circle3.setCenter(new LatLng(latitude,longitude));
 
         if(gameStarted == 1) {
 
@@ -822,13 +873,13 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                distance = loC.distance(latitude, longitude, spot21.getPosition().latitude, spot21.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot21.setVisible(false);
-                } else {
-                    spot21.setVisible(true);
-                }
+//                distance = loC.distance(latitude, longitude, spot21.getPosition().latitude, spot21.getPosition().longitude, "K");
+////                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
+//                if (distance >= scan_range) {
+//                    spot21.setVisible(false);
+//                } else {
+//                    spot21.setVisible(true);
+//                }
 
 
                 distance = loC.distance(latitude, longitude, spot22.getPosition().latitude, spot22.getPosition().longitude, "K");
@@ -868,7 +919,7 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
         return false;
@@ -890,11 +941,13 @@ public class MainActivity extends AppCompatActivity
         currentSteps = 0;
         hintNumber =1;
         gameStarted =1;
-        scan_range=0.040;
+        leftChance = 5;
+        scan_range=0.060;
         checked.clear();
+        chance.setText("Chance: "+leftChance);
     }
 
-    private void showDetailInfo(String id){
+    private void showDetailInfo(final String id){
         final PopupWindow mPopupWindow = new PopupWindow(MainActivity.this);
 
         // レイアウト設定
@@ -903,7 +956,7 @@ public class MainActivity extends AppCompatActivity
         TextView spotName = (TextView) popupView.findViewById(R.id.spot_name);
         TextView spotInfo = (TextView) popupView.findViewById(R.id.spot_info);
 
-        int idToInt;
+        final int idToInt;
 
         switch (id) {
             case "m0":
@@ -986,58 +1039,145 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
-        if (checked.contains(id) != true && gameStarted==1) {
-            switch (gameData.get(idToInt).bonusType) {
-                case 0:
-                    coins = coins + 5;
-                    coinText.setText("Coins: " + coins);
-                    Toast.makeText(getApplicationContext(), "You got 5 coins.", Toast.LENGTH_LONG).show();
-                    break;
-                case 1:
-                    hintNumber++;
-                    Toast.makeText(getApplicationContext(), "You got a new hint! Check it now.", Toast.LENGTH_LONG).show();
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    Toast.makeText(getApplicationContext(), "Congratulation! You find the treasure in" + currentSteps + "steps", Toast.LENGTH_LONG).show();
-                    gameStarted = 0;
-                    break;
-                default:
-                    break;
-            }
-        }
+
         spotName.setText(gameData.get(idToInt).name);
         spotInfo.setText(gameData.get(idToInt).description);
 
-            popupView.findViewById(R.id.close_button).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mPopupWindow.isShowing()) {
-                        mPopupWindow.dismiss();
-                    }
+        popupView.findViewById(R.id.close_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mPopupWindow.isShowing()) {
+                    mPopupWindow.dismiss();
                 }
-            });
-            mPopupWindow.setContentView(popupView);
+            }
+        });
+        mPopupWindow.setContentView(popupView);
 
 
-            // 背景設定
-            mPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_background));
+        // 背景設定
+        mPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_background));
 
-            // タップ時に他のViewでキャッチされないための設定
-            mPopupWindow.setOutsideTouchable(true);
-            mPopupWindow.setFocusable(true);
+        // タップ時に他のViewでキャッチされないための設定
+        mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.setFocusable(true);
 
-            // 表示サイズの設定 今回は幅300dp
-            float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics());
-            mPopupWindow.setWindowLayoutMode((int) width, WindowManager.LayoutParams.WRAP_CONTENT);
-            mPopupWindow.setWidth((int) width);
-            mPopupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        // 表示サイズの設定 今回は幅300dp
+        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics());
+        mPopupWindow.setWindowLayoutMode((int) width, WindowManager.LayoutParams.WRAP_CONTENT);
+        mPopupWindow.setWidth((int) width);
+        mPopupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
 
-            // 画面中央に表示
-            mPopupWindow.showAtLocation(findViewById(R.id.map), Gravity.CENTER, 0, 0);
 
-            checked.add(id);
+
+        if (checked.contains(id) != true && gameStarted==1) {
+
+               new AlertDialog.Builder(MainActivity.this).setTitle(gameData.get(idToInt).name)
+                        .setPositiveButton("Destination!",new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (idToInt != 21){
+                                    leftChance --;
+                                    chance.setText("Chance: "+leftChance);
+                                    if (leftChance == 0){
+                                        Toast.makeText(getApplicationContext(), "Game Over. Please try again.", Toast.LENGTH_LONG).show();
+                                        gameStarted = 0;
+                                    }else {
+                                        Toast.makeText(getApplicationContext(), "Ops. It's not a treasure. You have "+leftChance+" chance left.", Toast.LENGTH_LONG).show();
+                                    }
+                                }else {
+                                    Toast.makeText(getApplicationContext(), "Congratulation! You find the treasure in " + currentSteps + " steps", Toast.LENGTH_LONG).show();
+                                    gameStarted = 0;
+                                    mPopupWindow.showAtLocation(findViewById(R.id.map), Gravity.CENTER, 0, 0);
+                                    checked.add(id);
+                                }
+
+                            }
+
+                        }).setNegativeButton("Get hint",new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (gameData.get(idToInt).bonusType) {
+                            case 0:
+                                coins = coins + 5;
+                                coinText.setText("Coins: " + coins);
+                                Toast.makeText(getApplicationContext(), "You got 5 coins.", Toast.LENGTH_LONG).show();
+                                checked.add(id);
+                                break;
+                            case 1:
+                                hintNumber++;
+                                Toast.makeText(getApplicationContext(), "You got a new hint! Check it now.", Toast.LENGTH_LONG).show();
+                                checked.add(id);
+                                break;
+                            case 2:
+                                checked.add(id);
+                                break;
+                            case 3:
+//                                Toast.makeText(getApplicationContext(), "Congratulation! You find the treasure in" + currentSteps + "steps", Toast.LENGTH_LONG).show();
+//                                gameStarted = 0;
+//                                break;
+                                coins = coins + 5;
+                                coinText.setText("Coins: " + coins);
+                                Toast.makeText(getApplicationContext(), "You got 5 coins.", Toast.LENGTH_LONG).show();
+                                checked.add(id);
+                                break;
+                            default:
+                                checked.add(id);
+                                break;
+                        }
+                        // 画面中央に表示
+                        mPopupWindow.showAtLocation(findViewById(R.id.map), Gravity.CENTER, 0, 0);
+                    }
+
+                }).show();
+
+
+
+
+
+
+        }else if (checked.contains(id) != false && gameStarted==1)
+        {
+            new AlertDialog.Builder(MainActivity.this).setTitle(gameData.get(idToInt).name)
+                    .setPositiveButton("Destination!",new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (idToInt == 21){
+                                Toast.makeText(getApplicationContext(), "Congratulation! You find the treasure in" + currentSteps + "steps", Toast.LENGTH_LONG).show();
+                                gameStarted = 0;
+                                checked.add(id);
+                            }else {
+                                leftChance --;
+                                chance.setText("Chance: "+leftChance);
+                                if (leftChance == 0){
+                                    Toast.makeText(getApplicationContext(), "Game Over. Please try again.", Toast.LENGTH_LONG).show();
+                                    gameStarted = 0;
+                                }else {
+                                    Toast.makeText(getApplicationContext(), "Ops. It's not a treasure. You have "+leftChance+" chance left.", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                            // 画面中央に表示
+                            mPopupWindow.showAtLocation(findViewById(R.id.map), Gravity.CENTER, 0, 0);
+                        }
+
+                    }).setNegativeButton("Get hint",new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(getApplicationContext(), "You have already checked this spot", Toast.LENGTH_LONG).show();
+                    // 画面中央に表示
+                    mPopupWindow.showAtLocation(findViewById(R.id.map), Gravity.CENTER, 0, 0);
+                }
+
+            }).show();
+        }
+
+
+
+
+
 
 
 

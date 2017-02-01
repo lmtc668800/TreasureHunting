@@ -60,5 +60,16 @@
         android:layout_marginLeft="1dp"
         android:layout_marginTop="6dp" />
 
+    <Button
+        android:text="？"
+        android:textSize="20dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/round_button"
+        android:id="@+id/help"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
 
 </RelativeLayout>
