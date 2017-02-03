@@ -135,9 +135,9 @@ public class DataLoader {
             SpotData spot3 = new SpotData("International student lounge", 35.706281, 139.706158, "Find: Some where you can get help at school.", 2, "hint");
             SpotData spot4 = new SpotData("School Bus station", 35.705643, 139.706719, "You can also check the schedule by Waseda mobile app.", 0, "hint");
             SpotData spot5 = new SpotData("Building 51", 35.706057, 139.706644, "The tallest building in this campus.", 1, "hint");
-            SpotData spot6 = new SpotData("Bld62 Reading room.", 35.705638, 139.707178, "Lot of student even do not know about this reading room.", 0, "hint");
+            SpotData spot6 = new SpotData("Bld52 Reading room", 35.705638, 139.707178, "Lot of student even do not know about this reading room.", 0, "hint");
             SpotData spot7 = new SpotData("Student Co-op cafeteria", 35.706322, 139.707894, "You will have fun on visiting here, even if you do not buy anything.", 0, "hint");
-            SpotData spot8 = new SpotData("Rest place.", 35.705922, 139.707593, "Find: Find a place that you can have a rest no matter rainy or windy.", 2, "hint");
+            SpotData spot8 = new SpotData("Rest place", 35.705922, 139.707593, "Find: Find a place that you can have a rest no matter rainy or windy.", 2, "hint");
             SpotData spot9 = new SpotData("YuuCho Bank ATM", 35.706465, 139.707070, "If you want to send a mail, there is also a big post office outside school.", 0, "hint");
             SpotData spot10 = new SpotData("Tully's Coffee", 35.706001, 139.708591, "This shop will be closed when the school is not open.", 3, "hint");
             waseda.add(spot1);
