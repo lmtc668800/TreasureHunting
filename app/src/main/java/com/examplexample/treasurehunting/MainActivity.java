@@ -159,6 +159,7 @@ public class MainActivity extends AppCompatActivity
     int unlockedGame = 0;
     int coins=0;
     int stage=0;
+    int destination = 0;
 
     List<SpotData> gameData;
     List<String> hintData;
@@ -185,6 +186,20 @@ public class MainActivity extends AppCompatActivity
         unlockedGame = bundle.getInt("unlockedGame");
         stage = bundle.getInt("stage");
 
+        switch (stage){
+            case 0:
+                destination = 9;
+                break;
+
+            case 1:
+                destination =21;
+                break;
+
+            default:
+                destination =0;
+                break;
+        }
+
         coinText= (TextView) findViewById(R.id.coins_text_main);
         coinText.setText("Coins: " + coins);
         steps=(TextView) this.findViewById(R.id.steps);
@@ -195,13 +210,21 @@ public class MainActivity extends AppCompatActivity
 
         DataLoader dataLoader = new DataLoader();
         gameData = dataLoader.LoadIn(stage);
-        hintData = dataLoader.LoadHints();
+        hintData = dataLoader.LoadHints(stage);
 
         gps = new GPSTracker(MainActivity.this);
         latitude = gps.getLatitude();
         longitude = gps.getLongitude();
 
-        startPoint = new LatLng(35.692164,139.701101);
+        switch (stage){
+            case 0:
+                startPoint = new LatLng(35.707012,139.704780);
+                break;
+
+            default:
+                startPoint = new LatLng(35.692164,139.701101);
+        }
+
 
 
         SupportMapFragment mapFragment =
@@ -268,10 +291,8 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(View view) {
                         if (gameStarted ==1) {
                             new AlertDialog.Builder(MainActivity.this).setTitle("SHOP").setItems(
-//                                    new String[]{"Unlock a hint(5 coins)", "Master mode on", "Master mode off"}, new DialogInterface.OnClickListener() {
-
-
-                                    new String[]{"Unlock a hint(10 coins)"}, new DialogInterface.OnClickListener() {
+                                    new String[]{"Unlock a hint(10 coins)", "Master mode on", "Master mode off"}, new DialogInterface.OnClickListener() {
+//                                    new String[]{"Unlock a hint(10 coins)"}, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int which) {
 
@@ -285,11 +306,11 @@ public class MainActivity extends AppCompatActivity
                                                     Toast.makeText(getApplicationContext(), "Failed. Insufficient coins", Toast.LENGTH_LONG).show();
                                                 }
                                             }
-//                                            else if (which == 1) {
-//                                                scan_range = scan_range + 10;
-//                                            } else if (which == 2){
-//                                                scan_range = 0.060;
-//                                            }
+                                            else if (which == 1) {
+                                                scan_range = scan_range + 10;
+                                            } else if (which == 2){
+                                                scan_range = 0.060;
+                                            }
 
                                         }
                                     }).setNegativeButton(
@@ -349,42 +370,6 @@ public class MainActivity extends AppCompatActivity
 
 
 
-//        fragmentManager.beginTransaction().replace(R.id.flContent, mapFragment).commit();
-
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
-
-
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Synchronize current location", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//                onMyLocationButtonClick();
-//            }
-//        });
-//
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.setDrawerListener(toggle);
-//        toggle.syncState();
-//
-//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
-
-
-        //SOLUTION1:failed
-//        openGPSSettings();
-//        getLocation();
-
 
 
         mSensorManager =  (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
@@ -396,96 +381,6 @@ public class MainActivity extends AppCompatActivity
         mStepCounterSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        if (drawer.isDrawerOpen(GravityCompat.START)) {
-//            drawer.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
-//
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
-//
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-////        Fragment fragment = null;
-////        Class fragmentClass;
-//
-////        if (id == R.id.map_page) {
-//        // Handle the map action
-////            fragmentClass = SupportMapFragment.class;
-////            FragmentManager fragmentManager = getSupportFragmentManager();
-////            fragmentManager.popBackStack();
-////            super.onResume();
-////
-////        } else {
-//        if (id == R.id.step_counter) {
-//            Intent intent = new Intent();
-//            intent.setClass(MainActivity.this, InformationActivity.class);
-//            startActivity(intent);
-//        } else if (id == R.id.information) {
-//
-//            //TODO: Hint page
-//            Intent intent = new Intent();
-//            intent.setClass(MainActivity.this, InformationActivity.class);
-//            startActivity(intent);
-//        } else {
-//
-//        }
-//
-////            try {
-////
-////                fragment = (Fragment) fragmentClass.newInstance();
-////
-////            } catch (Exception e) {
-////
-////                e.printStackTrace();
-////
-////            }
-//
-//
-//        // Insert the fragment by replacing any existing fragment
-////            FragmentManager fragmentManager = getSupportFragmentManager();
-////            fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
-//
-////            FragmentTransaction transaction = fragmentManager.beginTransaction();
-////            transaction.replace(R.id.flContent, fragment);
-////            transaction.addToBackStack("name");
-////            transaction.commit();
-////            super.onPause();
-//
-//
-////        }
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
 
 
 
@@ -496,24 +391,8 @@ public class MainActivity extends AppCompatActivity
         mMap.setOnMyLocationButtonClickListener(this);
         enableMyLocation();
 
-//        LatLng tullys = new LatLng(35.706003, 139.708591);
 
 
-        LatLng bld51 = new LatLng(35.705997, 139.706732);
-        LatLng westgate = new LatLng(35.706406, 139.704828);
-
-/*        spot1 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(0).name)
-//                .snippet("Is the treasure here?")
-                .position(new LatLng(gameData.get(0).latitude,gameData.get(0).longitude)));
-
-        spot2 =  map.addMarker(new MarkerOptions()
-                .title("Building 51")
-                .position(bld51));
-
-        spot3 = map.addMarker(new MarkerOptions()
-                .title("west gate of the campus")
-                .position(westgate));*/
 
 
 
@@ -708,7 +587,7 @@ public class MainActivity extends AppCompatActivity
 
 //        map.setMyLocationEnabled(true);
 
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(westgate, 15));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 15));
 
 
 
@@ -719,11 +598,33 @@ public class MainActivity extends AppCompatActivity
                 .strokeWidth(2)
                 .fillColor(Color.parseColor("#a0EAEFEA"));
 
-        CircleOptions circleOptions2 = new CircleOptions()
-                .center(startPoint)
-                .radius(600)
-                .strokeWidth(5)
-                .strokeColor(Color.parseColor("#f0AACC44"));
+
+                CircleOptions circleOptions2 = new CircleOptions();
+        switch (stage){
+            case 0:
+                 circleOptions2 = new CircleOptions()
+                        .center(new LatLng(35.706057, 139.706644))
+                        .radius(300)
+                        .strokeWidth(5)
+                        .strokeColor(Color.parseColor("#f0AACC44"));
+                break;
+            case 1:
+                 circleOptions2 = new CircleOptions()
+                        .center(startPoint)
+                        .radius(600)
+                        .strokeWidth(5)
+                        .strokeColor(Color.parseColor("#f0AACC44"));
+                break;
+            default:
+                 circleOptions2 = new CircleOptions()
+                        .center(startPoint)
+                        .radius(600)
+                        .strokeWidth(5)
+                        .strokeColor(Color.parseColor("#f0AACC44"));
+                break;
+
+        }
+
         Circle circle1 = map.addCircle(circleOptions1);
         Circle circle2 = map.addCircle(circleOptions2);
 
@@ -741,42 +642,6 @@ public class MainActivity extends AppCompatActivity
                 final String inf = marker.getId();
                 showDetailInfo(inf);
 
-
-
-
-
-//                new AlertDialog.Builder(MainActivity.this).setTitle("Locked Stage")
-//                        .setMessage("Search for treasure? Get hint?")
-//                        .setPositiveButton("Destination!",new DialogInterface.OnClickListener() {
-//
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                if (inf == "m23"){
-//                                    showDetailInfo(inf);
-//                                }else {
-//                                    Toast.makeText(getApplicationContext(), "Ops. It's not a treasure.", Toast.LENGTH_LONG).show();
-//                                }
-//
-//                            }
-//
-//                        }).setNegativeButton("Get hint",new DialogInterface.OnClickListener() {
-//
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        showDetailInfo(inf);
-//                    }
-//
-//                }).show();
-
-//
-//                double distance;
-//                gps = new GPSTracker(MainActivity.this);
-//                latitude = gps.getLatitude();
-//                longitude = gps.getLongitude();
-//                distance = loC.distance(latitude, longitude, marker.getPosition().latitude, marker.getPosition().longitude, "K");
-//                if (distance <= scan_range){
-//                    showDetailInfo(inf);
-//                }
 
             }
         });
@@ -1367,7 +1232,7 @@ public class MainActivity extends AppCompatActivity
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (idToInt != 21){
+                                if (idToInt != destination){
                                     leftChance --;
                                     chance.setText("Chance: "+leftChance);
                                     if (leftChance == 0){
