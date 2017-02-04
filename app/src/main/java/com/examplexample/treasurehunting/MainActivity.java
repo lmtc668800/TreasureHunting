@@ -1303,7 +1303,7 @@ public class MainActivity extends AppCompatActivity
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (idToInt == 21){
+                            if (idToInt == destination){
                                 Toast.makeText(getApplicationContext(), "Congratulation! You find the treasure in" + currentSteps + "steps", Toast.LENGTH_LONG).show();
                                 gameStarted = 0;
                                 checked.add(id);

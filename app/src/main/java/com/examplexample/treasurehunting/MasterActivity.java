@@ -110,8 +110,10 @@ public class MasterActivity extends AppCompatActivity {
             public void onClick(View view) {
                 new  AlertDialog.Builder(MasterActivity.this)
                         .setTitle("HELP" )
-                        .setMessage("Here are two stages.\nFor each stage. For each stage, there are several spots which may be a treasure or some bonus helping you to find the Treasure.\n" +
-                                "In each stage, there are two circle on the Map. You need to press 'NEW GAME' button inside the small circle. All of the spots will be inside the large circle." )
+                        .setMessage("In the stage, there will be several spots that you need to find out. One of them is the treasure.\n\n" +
+                                "When you find a spot, you may click 'Destination' to search for treasure, or 'Get Hint' to receive bonus.\n\n" +
+                                "There are three types of bonus:\n\nCOINS: Buy extra hint with it.\nHINT: Describing about treasure.\nSMALL HINT: Only show in spot description, leading you to other spots.\n\n" +
+                                "On the map, there are two circle on the Map.\n You need to start 'NEW GAME' inside the small circle. All of the spots will be located inside the large circle." )
                         .setPositiveButton("OK" ,  null )
                         .show();
             }
