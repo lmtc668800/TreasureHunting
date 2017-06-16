@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi-v4\\button_login.png",
+        "source": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\src\\main\\res\\mipmap-xxxhdpi\\button_login.png"
+    },
+    {
+        "merged": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi-v4\\button_login_pressed.png",
+        "source": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\src\\main\\res\\mipmap-xxxhdpi\\button_login_pressed.png"
+    }
+]

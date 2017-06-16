@@ -108,14 +108,25 @@ public class MasterActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new  AlertDialog.Builder(MasterActivity.this)
-                        .setTitle("HELP" )
-                        .setMessage("In the stage, there will be several spots that you need to find out. One of them is the treasure.\n\n" +
-                                "When you find a spot, you may click 'Destination' to search for treasure, or 'Get Hint' to receive bonus.\n\n" +
-                                "There are three types of bonus:\n\nCOINS: Buy extra hint with it.\nHINT: Describing about treasure.\nSMALL HINT: Only show in spot description, leading you to other spots.\n\n" +
-                                "On the map, there are two circle on the Map.\n You need to start 'NEW GAME' inside the small circle. All of the spots will be located inside the large circle." )
-                        .setPositiveButton("OK" ,  null )
-                        .show();
+//                new  AlertDialog.Builder(MasterActivity.this)
+//                        .setTitle("HELP" )
+//                        .setMessage("In the stage, there will be several spots that you need to find out. One of them is the treasure.\n\n" +
+//                                "When you find a spot, you may click 'Destination' to search for treasure, or 'Get Hint' to receive bonus.\n\n" +
+//                                "There are three types of bonus:\n\nCOINS: Buy extra hint with it.\nHINT: Describing about treasure.\nSMALL HINT: Only show in spot description, leading you to other spots.\n\n" +
+//                                "On the map, there are two circle on the Map.\n You need to start 'NEW GAME' inside the small circle. All of the spots will be located inside the large circle." )
+//                        .setPositiveButton("OK" ,  null )
+//                        .show();
+                Intent intent = new Intent();
+                intent.setClass(MasterActivity.this, CloudActivity.class);
+
+                Bundle bundle=new Bundle();
+                bundle.putInt("coins",coins);
+                bundle.putInt("unlockedGame",unlockedGame);
+                bundle.putInt("stage",0);
+                intent.putExtras(bundle);
+
+                startActivity(intent);
+
             }
         });
 

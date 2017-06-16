@@ -20,6 +20,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -42,6 +43,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
@@ -68,6 +71,16 @@ import org.w3c.dom.Text;
 import com.examplexample.treasurehunting.DataLoader;
 import com.examplexample.treasurehunting.SpotData;
 
+//Cloud contents from here
+import com.amazonaws.mobile.AWSMobileClient;
+import com.amazonaws.models.nosql.SpotDataDO;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.models.nosql.SpotLocationsDO;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.*;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.*;
+
 
 public class MainActivity extends AppCompatActivity
         implements  OnMapReadyCallback,OnMyLocationButtonClickListener,SensorEventListener{
@@ -86,6 +99,60 @@ public class MainActivity extends AppCompatActivity
     GPSTracker gps;
     LocationCalculator loC;
 
+//cloud
+    private SpotLocationsDO tmpSpot;
+    private SpotLocationsDO loadSpot;
+    private Runnable runnable1;
+    private Runnable runnable2;
+    String content = "null";
+
+    //Cloud/Database
+
+//    public void insertData() {
+
+//        // Fetch the default configured DynamoDB ObjectMapper
+//        final DynamoDBMapper dynamoDBMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
+//        final SpotDataDO tmpSpot = new SpotDataDO(); // Initialize the Notes Object
+//
+//        // The userId has to be set to user's Cognito Identity Id for private / protected tables.
+//        // User's Cognito Identity Id can be fetched by using:
+//        tmpSpot.setName("tmpName");
+//        tmpSpot.setDescription("tmpDescription");
+//        tmpSpot.setBonusType(1.0);
+//        tmpSpot.setLatitude(35.706407);
+//        tmpSpot.setLongitude(139.704855);
+//        tmpSpot.setBonusContent("tmpBonusContent");
+//
+//        dynamoDBMapper.save(tmpSpot);
+//
+//    }
+
+
+
+//    String tmpName = "花園神社";
+//    Double tmpLatitude;
+//    Double tmpLongitude;
+//    String tmpDescription;
+//    int tmpBonusType;
+//    String tmpBonusContent;
+//    public void getData(String name) {
+//        // Fetch the default configured DynamoDB ObjectMapper
+//        final DynamoDBMapper dynamoDBMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
+//
+//        final SpotDataDO tmpSpot = new SpotDataDO(); // Initialize the Notes Object
+//
+//        // The userId has to be set to user's Cognito Identity Id for private / protected tables.
+//        // User's Cognito Identity Id can be fetched by using:
+//        tmpSpot.setName("tmpName");
+//        tmpSpot.setDescription("tmpDescription");
+//        tmpSpot.setBonusType(1.0);
+//        tmpSpot.setLatitude(35.706407);
+//        tmpSpot.setLongitude(139.704855);
+//        tmpSpot.setBonusContent("tmpBonusContent");
+//
+//        dynamoDBMapper.save(tmpSpot);
+//
+//    }
 
     Marker spot1;
     Marker spot2;
@@ -160,8 +227,10 @@ public class MainActivity extends AppCompatActivity
     int coins=0;
     int stage=0;
     int destination = 0;
+    int totalSpotNumber = 0;
 
     List<SpotData> gameData;
+    List<Marker> spotList= new ArrayList<>();
     List<String> hintData;
 
     TextView coinText;
@@ -173,7 +242,9 @@ public class MainActivity extends AppCompatActivity
 //    Circle circle3;
 
 
-    List<Marker> spots;
+
+
+
 
 
     @Override
@@ -189,10 +260,12 @@ public class MainActivity extends AppCompatActivity
         switch (stage){
             case 0:
                 destination = 9;
+                totalSpotNumber = 10;
                 break;
 
             case 1:
                 destination =21;
+                totalSpotNumber = 43;
                 break;
 
             default:
@@ -253,8 +326,8 @@ public class MainActivity extends AppCompatActivity
                         if(stage == 1){
                             double distance;
                             distance = loC.distance(latitude, longitude, startPoint.latitude, startPoint.longitude, "K");
-//                            Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                            if (distance<= 0.040){
+//                          start distance changed
+                            if (distance<= 100.040){
                                 startNewGame();
                             }else{
                                 Toast.makeText(getApplicationContext(), "Please start at the circle area in the map.", Toast.LENGTH_LONG).show();
@@ -379,6 +452,38 @@ public class MainActivity extends AppCompatActivity
 
         //センサマネージャから TYPE_STEP_COUNTER についての情報を取得する
         mStepCounterSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+
+
+        //cloud
+        // Initialize the Amazon Cognito credentials provider
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                getApplicationContext(),
+                "ap-northeast-1:a4ef65bd-f3d1-416a-9d74-9c49a3d0dc61", // Identity Pool ID
+                Regions.AP_NORTHEAST_1 // Region
+        );
+
+
+        AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+        final DynamoDBMapper mapper = new DynamoDBMapper(ddbClient);
+
+        // デフォルトではUS-EASTがリージョンで指定されてしまうため意図的にAP_NORTHEASTにしています
+        Region apNortheast1 = Region.getRegion(Regions.AP_NORTHEAST_1);
+        ddbClient.setRegion(apNortheast1);
+
+
+
+/*        runnable2 = new Runnable() {
+            public void run() {
+                SpotLocationsDO loadSpot;
+                for (int l=0; l<10;l++){
+                    loadSpot= mapper.load(SpotLocationsDO.class,l);
+                    loadSpot.getName();
+                }
+
+            };
+        };*/
+
+
     }
 
 
@@ -391,195 +496,18 @@ public class MainActivity extends AppCompatActivity
         mMap.setOnMyLocationButtonClickListener(this);
         enableMyLocation();
 
+        //cloud
+//        Thread mythread = new Thread(runnable2);
+//        mythread.start();
 
 
 
-
-
-
-        spot1 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(0).name)
-                .position(new LatLng(gameData.get(0).latitude,gameData.get(0).longitude)));
-        spot2 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(1).name)
-                .position(new LatLng(gameData.get(1).latitude,gameData.get(1).longitude)));
-        spot3 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(2).name)
-                .position(new LatLng(gameData.get(2).latitude,gameData.get(2).longitude)));
-        spot4 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(3).name)
-                .position(new LatLng(gameData.get(3).latitude,gameData.get(3).longitude)));
-        spot5 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(4).name)
-                .position(new LatLng(gameData.get(4).latitude,gameData.get(4).longitude)));
-        spot6 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(5).name)
-                .position(new LatLng(gameData.get(5).latitude,gameData.get(5).longitude)));
-        spot7 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(6).name)
-                .position(new LatLng(gameData.get(6).latitude,gameData.get(6).longitude)));
-        spot8 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(7).name)
-                .position(new LatLng(gameData.get(7).latitude,gameData.get(7).longitude)));
-        spot9 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(8).name)
-                .position(new LatLng(gameData.get(8).latitude,gameData.get(8).longitude)));
-        spot10 = map.addMarker(new MarkerOptions()
-                .title(gameData.get(9).name)
-                .position(new LatLng(gameData.get(9).latitude,gameData.get(9).longitude)));
-
-        if(stage==1) {
-            spot11 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(10).name)
-                    .position(new LatLng(gameData.get(10).latitude, gameData.get(10).longitude)));
-            spot12 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(11).name)
-                    .position(new LatLng(gameData.get(11).latitude, gameData.get(11).longitude)));
-            spot13 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(12).name)
-                    .position(new LatLng(gameData.get(12).latitude, gameData.get(12).longitude)));
-            spot14 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(13).name)
-                    .position(new LatLng(gameData.get(13).latitude, gameData.get(13).longitude)));
-            spot15 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(14).name)
-                    .position(new LatLng(gameData.get(14).latitude, gameData.get(14).longitude)));
-            spot16 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(15).name)
-                    .position(new LatLng(gameData.get(15).latitude, gameData.get(15).longitude)));
-            spot17 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(16).name)
-                    .position(new LatLng(gameData.get(16).latitude, gameData.get(16).longitude)));
-            spot18 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(17).name)
-                    .position(new LatLng(gameData.get(17).latitude, gameData.get(17).longitude)));
-            spot19 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(18).name)
-                    .position(new LatLng(gameData.get(18).latitude, gameData.get(18).longitude)));
-            spot20 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(19).name)
-                    .position(new LatLng(gameData.get(19).latitude, gameData.get(19).longitude)));
-            spot21 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(20).name)
-                    .position(new LatLng(gameData.get(20).latitude, gameData.get(20).longitude)));
-            spot22 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(21).name)
-                    .position(new LatLng(gameData.get(21).latitude, gameData.get(21).longitude)));
-            spot23 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(22).name)
-                    .position(new LatLng(gameData.get(22).latitude, gameData.get(22).longitude)));
-            spot24 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(23).name)
-                    .position(new LatLng(gameData.get(23).latitude, gameData.get(23).longitude)));
-            spot25 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(24).name)
-                    .position(new LatLng(gameData.get(24).latitude, gameData.get(24).longitude)));
-
-
-            spot26 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(25).name)
-                    .position(new LatLng(gameData.get(25).latitude, gameData.get(25).longitude)));
-            spot27 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(26).name)
-                    .position(new LatLng(gameData.get(26).latitude, gameData.get(26).longitude)));
-            spot28 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(27).name)
-                    .position(new LatLng(gameData.get(27).latitude, gameData.get(27).longitude)));
-            spot29 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(28).name)
-                    .position(new LatLng(gameData.get(28).latitude, gameData.get(28).longitude)));
-            spot30 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(29).name)
-                    .position(new LatLng(gameData.get(29).latitude, gameData.get(29).longitude)));
-            spot31 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(30).name)
-                    .position(new LatLng(gameData.get(30).latitude, gameData.get(30).longitude)));
-            spot32 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(31).name)
-                    .position(new LatLng(gameData.get(31).latitude, gameData.get(31).longitude)));
-            spot33 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(32).name)
-                    .position(new LatLng(gameData.get(32).latitude, gameData.get(32).longitude)));
-            spot34 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(33).name)
-                    .position(new LatLng(gameData.get(33).latitude, gameData.get(33).longitude)));
-            spot35 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(34).name)
-                    .position(new LatLng(gameData.get(34).latitude, gameData.get(34).longitude)));
-            spot36 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(35).name)
-                    .position(new LatLng(gameData.get(35).latitude, gameData.get(35).longitude)));
-            spot37 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(36).name)
-                    .position(new LatLng(gameData.get(36).latitude, gameData.get(36).longitude)));
-            spot38 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(37).name)
-                    .position(new LatLng(gameData.get(37).latitude, gameData.get(37).longitude)));
-            spot39 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(38).name)
-                    .position(new LatLng(gameData.get(38).latitude, gameData.get(38).longitude)));
-            spot40 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(39).name)
-                    .position(new LatLng(gameData.get(39).latitude, gameData.get(39).longitude)));
-            spot41 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(40).name)
-                    .position(new LatLng(gameData.get(40).latitude, gameData.get(40).longitude)));
-            spot42 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(41).name)
-                    .position(new LatLng(gameData.get(41).latitude, gameData.get(41).longitude)));
-            spot43 = map.addMarker(new MarkerOptions()
-                    .title(gameData.get(42).name)
-                    .position(new LatLng(gameData.get(42).latitude, gameData.get(42).longitude)));
-        }
-
-
-
-        spot1.setVisible(false);
-        spot2.setVisible(false);
-        spot3.setVisible(false);
-        spot4.setVisible(false);
-        spot5.setVisible(false);
-        spot6.setVisible(false);
-        spot7.setVisible(false);
-        spot8.setVisible(false);
-        spot9.setVisible(false);
-        spot10.setVisible(false);
-
-        if (stage ==1) {
-            spot11.setVisible(false);
-            spot12.setVisible(false);
-            spot13.setVisible(false);
-            spot14.setVisible(false);
-            spot15.setVisible(false);
-            spot16.setVisible(false);
-            spot17.setVisible(false);
-            spot18.setVisible(false);
-            spot19.setVisible(false);
-            spot20.setVisible(false);
-            spot21.setVisible(false);
-            spot22.setVisible(false);
-            spot23.setVisible(false);
-            spot24.setVisible(false);
-            spot25.setVisible(false);
-
-            spot26.setVisible(false);
-            spot27.setVisible(false);
-            spot28.setVisible(false);
-            spot29.setVisible(false);
-            spot30.setVisible(false);
-            spot31.setVisible(false);
-            spot32.setVisible(false);
-            spot33.setVisible(false);
-            spot34.setVisible(false);
-            spot35.setVisible(false);
-            spot36.setVisible(false);
-            spot37.setVisible(false);
-            spot38.setVisible(false);
-            spot39.setVisible(false);
-            spot40.setVisible(false);
-            spot41.setVisible(false);
-            spot42.setVisible(false);
-            spot43.setVisible(false);
+        for (int l=0; l<totalSpotNumber; l++){
+            Marker marker = map.addMarker(new MarkerOptions()
+                    .title(gameData.get(l).name)
+                    .position(new LatLng(gameData.get(l).latitude,gameData.get(l).longitude)));
+            spotList.add(marker);
+            marker.setVisible(false);
         }
 
 
@@ -663,7 +591,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onMyLocationButtonClick() {
 
-
         double distance;
         gps = new GPSTracker(MainActivity.this);
         latitude = gps.getLatitude();
@@ -673,348 +600,16 @@ public class MainActivity extends AppCompatActivity
 
         if(gameStarted == 1) {
 
-                distance = loC.distance(latitude, longitude, spot1.getPosition().latitude, spot1.getPosition().longitude, "K");
+            for (int l=0;l<totalSpotNumber;l++){
+                distance = loC.distance(latitude, longitude, spotList.get(l).getPosition().latitude, spotList.get(l).getPosition().longitude, "K");
                 if (distance >= scan_range) {
-                    spot1.setVisible(false);
+                    spotList.get(l).setVisible(false);
                 } else {
-                    spot1.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot2.getPosition().latitude, spot2.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot2.setVisible(false);
-                } else {
-                    spot2.setVisible(true);
-                }
-
-
-
-                distance = loC.distance(latitude, longitude, spot3.getPosition().latitude, spot3.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot3.setVisible(false);
-                } else {
-                    spot3.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot4.getPosition().latitude, spot4.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot4.setVisible(false);
-                } else {
-                    spot4.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot5.getPosition().latitude, spot5.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot5.setVisible(false);
-                } else {
-                    spot5.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot6.getPosition().latitude, spot6.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot6.setVisible(false);
-                } else {
-                    spot6.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot7.getPosition().latitude, spot7.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot7.setVisible(false);
-                } else {
-                    spot7.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot8.getPosition().latitude, spot8.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot8.setVisible(false);
-                } else {
-                    spot8.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot9.getPosition().latitude, spot9.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot9.setVisible(false);
-                } else {
-                    spot9.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot10.getPosition().latitude, spot10.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot10.setVisible(false);
-                } else {
-                    spot10.setVisible(true);
-                }
-
-
-            if (stage ==1) {
-                distance = loC.distance(latitude, longitude, spot11.getPosition().latitude, spot11.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot11.setVisible(false);
-                } else {
-                    spot11.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot12.getPosition().latitude, spot12.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot12.setVisible(false);
-                } else {
-                    spot12.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot13.getPosition().latitude, spot13.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot13.setVisible(false);
-                } else {
-                    spot13.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot14.getPosition().latitude, spot14.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot14.setVisible(false);
-                } else {
-                    spot14.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot15.getPosition().latitude, spot15.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot15.setVisible(false);
-                } else {
-                    spot15.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot16.getPosition().latitude, spot16.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot16.setVisible(false);
-                } else {
-                    spot16.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot17.getPosition().latitude, spot17.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot17.setVisible(false);
-                } else {
-                    spot17.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot18.getPosition().latitude, spot18.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot18.setVisible(false);
-                } else {
-                    spot18.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot19.getPosition().latitude, spot19.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot19.setVisible(false);
-                } else {
-                    spot19.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot20.getPosition().latitude, spot20.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot20.setVisible(false);
-                } else {
-                    spot20.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot21.getPosition().latitude, spot21.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot21.setVisible(false);
-                } else {
-                    spot21.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot22.getPosition().latitude, spot22.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot22.setVisible(false);
-                } else {
-                    spot22.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot23.getPosition().latitude, spot23.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot23.setVisible(false);
-                } else {
-                    spot23.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot24.getPosition().latitude, spot24.getPosition().longitude, "K");
-//                Toast.makeText(getApplicationContext(), "Distance is :" + distance, Toast.LENGTH_LONG).show();
-                if (distance >= scan_range) {
-                    spot24.setVisible(false);
-                } else {
-                    spot24.setVisible(true);
-                }
-
-
-                distance = loC.distance(latitude, longitude, spot25.getPosition().latitude, spot25.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot25.setVisible(false);
-                } else {
-                    spot25.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot26.getPosition().latitude, spot26.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot26.setVisible(false);
-                } else {
-                    spot26.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot27.getPosition().latitude, spot27.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot27.setVisible(false);
-                } else {
-                    spot27.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot28.getPosition().latitude, spot28.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot28.setVisible(false);
-                } else {
-                    spot28.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot29.getPosition().latitude, spot29.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot29.setVisible(false);
-                } else {
-                    spot29.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot30.getPosition().latitude, spot30.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot30.setVisible(false);
-                } else {
-                    spot30.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot31.getPosition().latitude, spot31.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot31.setVisible(false);
-                } else {
-                    spot31.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot32.getPosition().latitude, spot32.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot32.setVisible(false);
-                } else {
-                    spot32.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot33.getPosition().latitude, spot33.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot33.setVisible(false);
-                } else {
-                    spot33.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot34.getPosition().latitude, spot34.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot34.setVisible(false);
-                } else {
-                    spot34.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot35.getPosition().latitude, spot35.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot35.setVisible(false);
-                } else {
-                    spot35.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot36.getPosition().latitude, spot36.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot36.setVisible(false);
-                } else {
-                    spot36.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot37.getPosition().latitude, spot37.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot37.setVisible(false);
-                } else {
-                    spot37.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot38.getPosition().latitude, spot38.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot38.setVisible(false);
-                } else {
-                    spot38.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot39.getPosition().latitude, spot39.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot39.setVisible(false);
-                } else {
-                    spot39.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot40.getPosition().latitude, spot40.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot40.setVisible(false);
-                } else {
-                    spot40.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot41.getPosition().latitude, spot41.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot41.setVisible(false);
-                } else {
-                    spot41.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot42.getPosition().latitude, spot42.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot42.setVisible(false);
-                } else {
-                    spot42.setVisible(true);
-                }
-
-                distance = loC.distance(latitude, longitude, spot43.getPosition().latitude, spot43.getPosition().longitude, "K");
-                if (distance >= scan_range) {
-                    spot43.setVisible(false);
-                } else {
-                    spot43.setVisible(true);
+                    spotList.get(l).setVisible(true);
                 }
             }
+
+
 
 
 
@@ -1391,6 +986,124 @@ public class MainActivity extends AppCompatActivity
             return  true;
         }
         return  super.onKeyDown(keyCode, event);
+    }
+
+
+    private void CloudLoadIn(int stage){
+            List<SpotData> shinjuku = new ArrayList<>();
+
+        // Initialize the Amazon Cognito credentials provider
+        final CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                getApplicationContext(),
+                "ap-northeast-1:a4ef65bd-f3d1-416a-9d74-9c49a3d0dc61", // Identity Pool ID
+                Regions.AP_NORTHEAST_1 // Region
+        );
+
+        final AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+
+        final DynamoDBMapper mapper = new DynamoDBMapper(ddbClient);
+
+        runnable1 = new Runnable() {
+            public void run() {
+                SpotLocationsDO loadSpot = mapper.load(SpotLocationsDO.class,14);
+                content = loadSpot.getName();
+            };
+        };
+
+
+
+//Bonus type:0->gold 1->Hint 2->SmallHint 3->treasure
+           /* SpotData spot1 = new SpotData("花園神社", 35.693436, 139.705262, "This shrine was founded in the mid-17th century.", 1, "Inside/beside a Department Store");
+            SpotData spot2 = new SpotData("TOHOシネマズ新宿", 35.695100, 139.701690, "You can have a discount on every 1st and 14th day of the month!", 1, "Go to the East.");
+            SpotData spot3 = new SpotData("新宿ピカデリー", 35.692676, 139.703616, "Find: Tourist Spot ", 2, "hint");
+            SpotData spot4 = new SpotData("歌舞伎町", 35.693769, 139.701344, "Find: Giant Monster Movie", 2, "hint");
+            SpotData spot5 = new SpotData("新宿野村ビル", 35.693311, 139.695985, "Welcome..Uh, maybe not", 0, "hint");
+            SpotData spot6 = new SpotData("東京モード学園", 35.691529, 139.696872, "Find: Feeling tiring of working?\nLet’s find somewhere quiet, somewhere in the city, but take us out of the city", 2, "hint");
+            SpotData spot7 = new SpotData("ヤマダ電機 LABI新宿東口館", 35.693481, 139.700824, "Need any electric goods? Visit here!", 0, "hint");
+            SpotData spot8 = new SpotData("伊勢丹 新宿店", 35.691929, 139.704283, "Find: Some where with Flowers.", 2, "hint");
+            SpotData spot9 = new SpotData("Kirin City キリンシティプラス新宿東南口", 35.690357, 139.701309, "Find: Here is what you have at night, find somewhere you would like to have in the morning ", 2, "hint");
+            SpotData spot10 = new SpotData("小田急百貨店 新宿店", 35.691284, 139.699321, "Find: Let’s explore the Another Area", 2, "hint");
+            SpotData spot11 = new SpotData("紀伊国屋書店新宿本店", 35.691911, 139.702804, "Big book Store! Reading book is a good hobby.", 0, "hint");
+            SpotData spot12 = new SpotData("新宿プリンスホテル", 35.694531, 139.700161, "Find: Rabbit", 2, "hint");
+            SpotData spot13 = new SpotData("スターバックスコーヒー 新宿新南口店", 35.688886, 139.702420, "Find: somewhere is competitor of here", 2, "hint");
+            SpotData spot14 = new SpotData("ビームス 新宿", 35.691458, 139.701122, "A clothing brand which is established in 1976", 0, "hint");
+            SpotData spot15 = new SpotData("ビックロ ビックカメラ 新宿東口", 35.691399, 139.703069, "I have a uniqlo, I have a bic Camera.Ah~BiQlo", 0, "hint");
+            SpotData spot16 = new SpotData("損保ジャパン日本興亜美術館", 35.692450, 139.695846, "Artist Museum. Visit here next time!", 1, "It is a CINEMA ");
+            SpotData spot17 = new SpotData("新宿マルイ メン", 35.692506, 139.706005, "Find: Try to find another 'OIOI' department.", 2, "hint");
+            SpotData spot18 = new SpotData("京王百貨店 新宿店", 35.690025, 139.698844, "Find: To left or to right? ", 2, "hint");
+            SpotData spot19 = new SpotData("三菱東京UFJ銀行 新宿通支店", 35.690688, 139.704508, "Find: You may on the correct 'way'.", 2, "hint");
+            SpotData spot20 = new SpotData("ファミリーマート 新宿損保ジャパン店", 35.693045, 139.696550, "Buy some drinks and take a rest here. Don't worry about the steps.", 0, "hint");
+            SpotData spot21 = new SpotData("新宿ミロード", 35.689230, 139.699803, "Welcome", 0, "hint");
+            SpotData spot22 = new SpotData("新宿バルト9", 35.690269, 139.705781, "1300yen during 17:30～19：55.", 3, "hint");
+            SpotData spot23 = new SpotData("新宿区役所 本庁舎", 35.693805, 139.703463, "Don't forget pay for your tax.", 0, "hint");
+            SpotData spot24 = new SpotData("K’s　cinema", 35.690143, 139.702769, "Find: Isn’t it close?", 2, "hint");
+            SpotData spot25 = new SpotData("ブルーボトルコーヒー 新宿カフェ", 35.688809, 139.702068, "What about have a coffee here?", 1, "Having a very famous cafe nearby.");
+
+            SpotData spot26 = new SpotData("伊勢丹メンズ館", 35.692585, 139.704564, "Find: If you have three wishes, what would they be", 2, "hint");
+            SpotData spot27 = new SpotData("新宿 東南口駐輪場", 35.689603, 139.701626, "Find: Somewhere opened in 2016. Be careful when pass the street.", 2, "hint");
+            SpotData spot28 = new SpotData("ドン・キホーテ 新宿東口本店", 35.693762, 139.701682, "Find: somewhere founded in 1930s. ", 2, "hint");
+            SpotData spot29 = new SpotData("DEAN & DELUCA MARKET STORES 新宿", 35.689478, 139.701332, "Welcome", 0, "hint");
+            SpotData spot30 = new SpotData("新宿西口ハルク", 35.692743, 139.698809, "Find: Yes, you can find something in this area.But who knows what is you really want.", 2, "hint");
+            SpotData spot31 = new SpotData("スターバックスコーヒー 新宿エルタワー店", 35.692142, 139.697776, "Welcome", 0, "hint");
+            SpotData spot32 = new SpotData("モザイク通り", 35.690969, 139.699362, "Find: How about try seeing from another perspective?", 2, "hint");
+            SpotData spot33 = new SpotData("新宿駅東口駐車場", 35.691926, 139.701305, "Find: I hpoe you are coming from west.", 2, "hint");
+            SpotData spot34 = new SpotData("マクドナルド 新宿スバルビル店", 35.691405, 139.697807, "Welcome", 0, "hint");
+            SpotData spot35 = new SpotData("湖南菜館", 35.694311, 139.701032, "Find: Almost there", 2, "hint");
+            SpotData spot36 = new SpotData("河合塾新宿校", 35.693516, 139.696838, "Welcome", 0, "hint");
+            SpotData spot37 = new SpotData("六歌仙", 35.693408, 139.698893, "Are we going to the EAST? ", 2, "hint");
+            SpotData spot38 = new SpotData("FOREVER21 新宿店", 35.690011, 139.704679, "Welcome", 0, "hint");
+            SpotData spot39 = new SpotData("新宿高島屋", 35.687451, 139.702663, "Don't spend too much time here.", 0, "hint");
+            SpotData spot40 = new SpotData("びゅうプラザ", 35.688236, 139.700641, "How did you find me lol lol lol", 0, "hint");
+            SpotData spot41 = new SpotData("Brooklyn Parlor 新宿", 35.690251, 139.705960, "Find: Sometimes we only need a little confidence and bravery.", 2, "It is a CINEMA ");
+            SpotData spot42 = new SpotData("世界堂 新宿本店", 35.689996, 139.706475, "Find: Try to find another Marui department.", 2, "hint");
+            SpotData spot43 = new SpotData("百果園", 35.692539, 139.700947, "Have some fruits with you!", 0, "hint");
+
+
+            shinjuku.add(spot1);
+            shinjuku.add(spot2);
+            shinjuku.add(spot3);
+            shinjuku.add(spot4);
+            shinjuku.add(spot5);
+            shinjuku.add(spot6);
+            shinjuku.add(spot7);
+            shinjuku.add(spot8);
+            shinjuku.add(spot9);
+            shinjuku.add(spot10);
+            shinjuku.add(spot11);
+            shinjuku.add(spot12);
+            shinjuku.add(spot13);
+            shinjuku.add(spot14);
+            shinjuku.add(spot15);
+            shinjuku.add(spot16);
+            shinjuku.add(spot17);
+            shinjuku.add(spot18);
+            shinjuku.add(spot19);
+            shinjuku.add(spot20);
+            shinjuku.add(spot21);
+            shinjuku.add(spot22);
+            shinjuku.add(spot23);
+            shinjuku.add(spot24);
+            shinjuku.add(spot25);
+            shinjuku.add(spot26);
+            shinjuku.add(spot27);
+            shinjuku.add(spot28);
+            shinjuku.add(spot29);
+            shinjuku.add(spot30);
+            shinjuku.add(spot31);
+            shinjuku.add(spot32);
+            shinjuku.add(spot33);
+            shinjuku.add(spot34);
+            shinjuku.add(spot35);
+            shinjuku.add(spot36);
+            shinjuku.add(spot37);
+            shinjuku.add(spot38);
+            shinjuku.add(spot39);
+            shinjuku.add(spot40);
+            shinjuku.add(spot41);
+            shinjuku.add(spot42);
+            shinjuku.add(spot43);*/
+
+
     }
 
 
