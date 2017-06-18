@@ -1,27 +1,59 @@
 package com.examplexample.treasurehunting;
 
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.models.nosql.SpotLocationsDO;
+import com.amazonaws.models.nosql.UserDataStorageDO;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.*;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.*;
 
+import org.w3c.dom.Text;
+
 public class CloudActivity extends AppCompatActivity {
 
 
 
-    TextView text;
-    private SpotLocationsDO tmpSpot;
-    private SpotLocationsDO loadSpot;
+    TextView editView;
+    TextView usernameView;
+    TextView latitudeView;
+    TextView longitudeView;
+    TextView currentStepsView;
+    TextView coinsView;
+    TextView hintNumberView;
     private Runnable runnable;
     private Runnable runnable2;
-    String content = "null";
+    String username;
+    Double latitude;
+    Double longitude;
+    int currentSteps;
+    int coins;
+    int hintNumber;
+
+    String username2;
+    Double latitude2;
+    Double longitude2;
+    int currentSteps2;
+    int coins2;
+    int hintNumber2;
+
+    String latitude3;
+    String longitude3;
+    String currentSteps3;
+    String coins3;
+    String hintNumber3;
+
+
+    int exist = 0;
+
 
 
 
@@ -30,17 +62,67 @@ public class CloudActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cloud);
 
-        text= (TextView) findViewById(R.id.cloudData);
-        text.setText("Origin");
 
-        Button button = (Button) findViewById(R.id.cloudBottom);
-        button.setOnClickListener(new View.OnClickListener() {
+        editView= (TextView) findViewById(R.id.editText);
+
+        Bundle bundle = this.getIntent().getExtras();
+        username = bundle.getString("username");
+        latitude = bundle.getDouble("latitude");
+        longitude = bundle.getDouble("longitude");
+        currentSteps = bundle.getInt("stepNumber");
+        coins = bundle.getInt("coins");
+        hintNumber = bundle.getInt("unlockedHint");
+
+
+
+
+
+        Button button1 = (Button) findViewById(R.id.cloudUploadBottom);
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Thread mythread = new Thread(runnable);
+                mythread.start();
+            }
+        });
+
+        Button button2 = (Button) findViewById(R.id.cloudCheckButton);
+        button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                text.setText(content);
+                if (editView.getText().toString().matches("")) {
+                    Toast.makeText(getApplicationContext(), "You did not enter a username", Toast.LENGTH_LONG).show();
+
+                }else {
+
+                    Thread mythread = new Thread(runnable2);
+                    mythread.start();
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                    }
+
+                    latitude3 = "LatestLat = " + latitude2;
+                    longitude3 = "LatestLon = " + longitude2;
+                    currentSteps3 = "Steps: " + String.valueOf(currentSteps2);
+                    coins3 = "Coins: " + String.valueOf(coins2);
+                    hintNumber3 = "Hints: " + String.valueOf(hintNumber2);
+
+                    if (exist == 1) {
+                        new AlertDialog.Builder(CloudActivity.this).setTitle(username2).setItems(
+                                new String[]{latitude3,longitude3,currentSteps3,coins3,hintNumber3}, null).setNegativeButton(
+                                "确定", null).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Not exist.", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
         });
+
+
+
 
         // Initialize the Amazon Cognito credentials provider
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
@@ -61,32 +143,46 @@ public class CloudActivity extends AppCompatActivity {
         // インターネットのアクセスを行うためにスレッドを作成し、その中でインサート処理を定義します
         runnable = new Runnable() {
             public void run() {
-                SpotLocationsDO tmpSpot = new SpotLocationsDO();
-                //never set to 0-42
-/*                tmpSpot.setItemId(50);
-                tmpSpot.setName("tmp");
-                tmpSpot.setLatitude(35.694531);
-                tmpSpot.setLongitude(139.700161);
-                tmpSpot.setDescription("Find: Rabbit");
-                tmpSpot.setBonusType(2);
-                tmpSpot.setBonusContent("hint");
-                mapper.save(tmpSpot);*/
+                UserDataStorageDO userdata = new UserDataStorageDO();
+                userdata.setUserName(username);
+                userdata.setLatestLatitude(latitude);
+                userdata.setLatestLongitude(longitude);
+                userdata.setStepNumber(currentSteps);
+                userdata.setCoins(coins);
+                userdata.setUnlockHintNumber(hintNumber);
 
-                //存在响应时间问题
-                SpotLocationsDO loadSpot = mapper.load(SpotLocationsDO.class,38);
-                content = loadSpot.getName();
+                mapper.save(userdata);
             };
         };
 
         runnable2 = new Runnable() {
             public void run() {
-                SpotLocationsDO loadSpot = mapper.load(SpotLocationsDO.class,"花園神社");
-                content = loadSpot.getName();
+
+                UserDataStorageDO loadUserdata = mapper.load(UserDataStorageDO.class,editView.getText().toString());
+                if (loadUserdata != null) {
+                    username2 = loadUserdata.getUserName();
+                    latitude2 = loadUserdata.getLatestLatitude();
+                    longitude2 = loadUserdata.getLatestLongitude();
+                    currentSteps2 = loadUserdata.getStepNumber();
+                    coins2 = loadUserdata.getCoins();
+                    hintNumber2 = loadUserdata.getUnlockHintNumber();
+                    exist = 1;
+                }else{
+                    exist = 0;
+                }
+
+
+
             };
         };
 
-        Thread mythread = new Thread(runnable);
-        mythread.start();
+/*        runnable2 = new Runnable() {
+            public void run() {
+                SpotLocationsDO loadSpot = mapper.load(SpotLocationsDO.class,"花園神社");
+                content = loadSpot.getName();
+            };
+        };*/
+
 
 
 

@@ -106,53 +106,6 @@ public class MainActivity extends AppCompatActivity
     private Runnable runnable2;
     String content = "null";
 
-    //Cloud/Database
-
-//    public void insertData() {
-
-//        // Fetch the default configured DynamoDB ObjectMapper
-//        final DynamoDBMapper dynamoDBMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
-//        final SpotDataDO tmpSpot = new SpotDataDO(); // Initialize the Notes Object
-//
-//        // The userId has to be set to user's Cognito Identity Id for private / protected tables.
-//        // User's Cognito Identity Id can be fetched by using:
-//        tmpSpot.setName("tmpName");
-//        tmpSpot.setDescription("tmpDescription");
-//        tmpSpot.setBonusType(1.0);
-//        tmpSpot.setLatitude(35.706407);
-//        tmpSpot.setLongitude(139.704855);
-//        tmpSpot.setBonusContent("tmpBonusContent");
-//
-//        dynamoDBMapper.save(tmpSpot);
-//
-//    }
-
-
-
-//    String tmpName = "花園神社";
-//    Double tmpLatitude;
-//    Double tmpLongitude;
-//    String tmpDescription;
-//    int tmpBonusType;
-//    String tmpBonusContent;
-//    public void getData(String name) {
-//        // Fetch the default configured DynamoDB ObjectMapper
-//        final DynamoDBMapper dynamoDBMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
-//
-//        final SpotDataDO tmpSpot = new SpotDataDO(); // Initialize the Notes Object
-//
-//        // The userId has to be set to user's Cognito Identity Id for private / protected tables.
-//        // User's Cognito Identity Id can be fetched by using:
-//        tmpSpot.setName("tmpName");
-//        tmpSpot.setDescription("tmpDescription");
-//        tmpSpot.setBonusType(1.0);
-//        tmpSpot.setLatitude(35.706407);
-//        tmpSpot.setLongitude(139.704855);
-//        tmpSpot.setBonusContent("tmpBonusContent");
-//
-//        dynamoDBMapper.save(tmpSpot);
-//
-//    }
 
     Marker spot1;
     Marker spot2;
@@ -197,14 +150,6 @@ public class MainActivity extends AppCompatActivity
     Marker spot41;
     Marker spot42;
     Marker spot43;
-//    Marker spot44;
-//    Marker spot45;
-//    Marker spot46;
-//    Marker spot47;
-//    Marker spot48;
-//    Marker spot49;
-//    Marker spot50;
-
 
 
 
@@ -228,6 +173,7 @@ public class MainActivity extends AppCompatActivity
     int stage=0;
     int destination = 0;
     int totalSpotNumber = 0;
+    String username;
 
 //    List<SpotData> gameData;
     List<SpotLocationsDO> gameData2 = new ArrayList<>();
@@ -289,6 +235,7 @@ public class MainActivity extends AppCompatActivity
         coins = bundle.getInt("coins");
         unlockedGame = bundle.getInt("unlockedGame");
         stage = bundle.getInt("stage");
+        username = bundle.getString("username");
 
         switch (stage){
             case 0:
@@ -397,7 +344,7 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(View view) {
                         if (gameStarted ==1) {
                             new AlertDialog.Builder(MainActivity.this).setTitle("SHOP").setItems(
-                                    new String[]{"Unlock a hint(10 coins)", "Master mode on", "Master mode off"}, new DialogInterface.OnClickListener() {
+                                    new String[]{"Unlock a hint(10 coins)", "Master mode on", "Master mode off","Information"}, new DialogInterface.OnClickListener() {
 //                                    new String[]{"Unlock a hint(10 coins)"}, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int which) {
@@ -416,6 +363,19 @@ public class MainActivity extends AppCompatActivity
                                                 scan_range = scan_range + 10;
                                             } else if (which == 2){
                                                 scan_range = 0.060;
+                                            }else if (which == 3){
+                                                Intent intent = new Intent();
+                                                intent.setClass(MainActivity.this, CloudActivity.class);
+
+                                                Bundle bundle=new Bundle();
+                                                bundle.putString("username",username);
+                                                bundle.putDouble("latitude",latitude);
+                                                bundle.putDouble("longitude",longitude);
+                                                bundle.putInt("stepNumber",currentSteps);
+                                                bundle.putInt("coins",coins);
+                                                bundle.putInt("unlockedHint", hintNumber);
+                                                intent.putExtras(bundle);
+                                                startActivity(intent);
                                             }
 
                                         }
@@ -448,6 +408,7 @@ public class MainActivity extends AppCompatActivity
                                         Bundle bundle=new Bundle();
                                         bundle.putInt("coins",coins);
                                         bundle.putInt("unlockedGame", unlockedGame);
+                                        bundle.putString("username",username);
                                         intent.putExtras(bundle);
 
                                         startActivity(intent);

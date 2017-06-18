@@ -18,6 +18,7 @@ public class MasterActivity extends AppCompatActivity {
 
     int unlockedGame = 1;
     int coins = 0;
+    String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +28,7 @@ public class MasterActivity extends AppCompatActivity {
         Bundle bundle = this.getIntent().getExtras();
         coins = bundle.getInt("coins");
         unlockedGame = bundle.getInt("unlockedGame");
+        username = bundle.getString("username");
 
         final TextView coinText= (TextView) findViewById(R.id.coinsText);
         coinText.setText("COINS: " + coins);
@@ -44,6 +46,7 @@ public class MasterActivity extends AppCompatActivity {
                 bundle.putInt("coins",coins);
                 bundle.putInt("unlockedGame",unlockedGame);
                 bundle.putInt("stage",0);
+                bundle.putString("username",username);
                 intent.putExtras(bundle);
 
                 startActivity(intent);
@@ -68,6 +71,7 @@ public class MasterActivity extends AppCompatActivity {
                     bundle.putInt("coins",coins);
                     bundle.putInt("unlockedGame", unlockedGame);
                     bundle.putInt("stage",1);
+                    bundle.putString("username",username);
                     intent.putExtras(bundle);
 
                     startActivity(intent);
@@ -117,7 +121,7 @@ public class MasterActivity extends AppCompatActivity {
 //                        .setPositiveButton("OK" ,  null )
 //                        .show();
                 Intent intent = new Intent();
-                intent.setClass(MasterActivity.this, CloudActivity.class);
+                intent.setClass(MasterActivity.this, LogoActivity.class);
 
                 Bundle bundle=new Bundle();
                 bundle.putInt("coins",coins);
