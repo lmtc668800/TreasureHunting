@@ -8,12 +8,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class LogoActivity extends AppCompatActivity {
+public class LogInActivity extends AppCompatActivity {
+
+    int demoType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_logo);
+        setContentView(R.layout.activity_login);
+
+        Bundle bundle = this.getIntent().getExtras();
+        demoType = bundle.getInt("DemoType");
 
 
 
@@ -34,11 +39,12 @@ public class LogoActivity extends AppCompatActivity {
 
                 }else{
                     Intent intent = new Intent();
-                    intent.setClass(LogoActivity.this, MasterActivity.class);
+                    intent.setClass(LogInActivity.this, MasterActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putInt("coins", 50);
                     bundle.putInt("unlockedGame", 1);
                     bundle.putString("username",username);
+                    bundle.putInt("DemoType",demoType);
                     intent.putExtras(bundle);
 
                     startActivity(intent);

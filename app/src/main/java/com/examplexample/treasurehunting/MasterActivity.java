@@ -12,13 +12,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 public class MasterActivity extends AppCompatActivity {
 
     int unlockedGame = 1;
     int coins = 0;
     String username;
+    int demoType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +28,7 @@ public class MasterActivity extends AppCompatActivity {
         coins = bundle.getInt("coins");
         unlockedGame = bundle.getInt("unlockedGame");
         username = bundle.getString("username");
+        demoType = bundle.getInt("DemoType");
 
         final TextView coinText= (TextView) findViewById(R.id.coinsText);
         coinText.setText("COINS: " + coins);
@@ -47,6 +47,7 @@ public class MasterActivity extends AppCompatActivity {
                 bundle.putInt("unlockedGame",unlockedGame);
                 bundle.putInt("stage",0);
                 bundle.putString("username",username);
+                bundle.putInt("DemoType",demoType);
                 intent.putExtras(bundle);
 
                 startActivity(intent);
@@ -72,6 +73,7 @@ public class MasterActivity extends AppCompatActivity {
                     bundle.putInt("unlockedGame", unlockedGame);
                     bundle.putInt("stage",1);
                     bundle.putString("username",username);
+                    bundle.putInt("DemoType",demoType);
                     intent.putExtras(bundle);
 
                     startActivity(intent);
@@ -121,7 +123,7 @@ public class MasterActivity extends AppCompatActivity {
 //                        .setPositiveButton("OK" ,  null )
 //                        .show();
                 Intent intent = new Intent();
-                intent.setClass(MasterActivity.this, LogoActivity.class);
+                intent.setClass(MasterActivity.this, LogInActivity.class);
 
                 Bundle bundle=new Bundle();
                 bundle.putInt("coins",coins);

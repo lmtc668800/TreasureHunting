@@ -132,12 +132,12 @@
         "source": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.0\\res\\layout\\abc_list_menu_item_icon.xml"
     },
     {
-        "merged": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\res\\merged\\release\\layout\\abc_action_mode_bar.xml",
-        "source": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.0\\res\\layout\\abc_action_mode_bar.xml"
-    },
-    {
         "merged": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\res\\merged\\release\\layout\\abc_action_menu_layout.xml",
         "source": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.0\\res\\layout\\abc_action_menu_layout.xml"
+    },
+    {
+        "merged": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\res\\merged\\release\\layout\\abc_action_mode_bar.xml",
+        "source": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.0\\res\\layout\\abc_action_mode_bar.xml"
     },
     {
         "merged": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\res\\merged\\release\\layout\\abc_list_menu_item_layout.xml",
@@ -152,12 +152,12 @@
         "source": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.0\\res\\layout\\abc_action_bar_view_list_nav_layout.xml"
     },
     {
-        "merged": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\res\\merged\\release\\layout\\abc_expanded_menu_layout.xml",
-        "source": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.0\\res\\layout\\abc_expanded_menu_layout.xml"
-    },
-    {
         "merged": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\res\\merged\\release\\layout\\activity_sign_up.xml",
         "source": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\src\\main\\res\\layout\\activity_sign_up.xml"
+    },
+    {
+        "merged": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\res\\merged\\release\\layout\\abc_expanded_menu_layout.xml",
+        "source": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.1.0\\res\\layout\\abc_expanded_menu_layout.xml"
     },
     {
         "merged": "D:\\Development\\Android\\Project\\TreasureHunting\\AWSMobileHelper\\build\\intermediates\\res\\merged\\release\\layout\\select_dialog_singlechoice_material.xml",

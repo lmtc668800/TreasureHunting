@@ -1,36 +1,28 @@
 package com.examplexample.treasurehunting;
 
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.models.nosql.SpotLocationsDO;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.models.nosql.UserDataStorageDO;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.dynamodbv2.*;
-import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.*;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 
-import org.w3c.dom.Text;
-
-public class CloudActivity extends AppCompatActivity {
+public class CloudSecureActivity extends AppCompatActivity {
 
 
 
     TextView editView;
-    TextView usernameView;
-    TextView latitudeView;
-    TextView longitudeView;
-    TextView currentStepsView;
-    TextView coinsView;
-    TextView hintNumberView;
     private Runnable runnable;
     private Runnable runnable2;
+    private Runnable checkAutho;
     String username;
     Double latitude;
     Double longitude;
@@ -53,6 +45,8 @@ public class CloudActivity extends AppCompatActivity {
 
 
     int exist = 0;
+    int authorization = 0;
+    int right;
 
 
 
@@ -60,7 +54,7 @@ public class CloudActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cloud);
+        setContentView(R.layout.activity_cloud2);
 
 
         editView= (TextView) findViewById(R.id.editText);
@@ -94,28 +88,32 @@ public class CloudActivity extends AppCompatActivity {
                 if (editView.getText().toString().matches("")) {
                     Toast.makeText(getApplicationContext(), "You did not enter a username", Toast.LENGTH_LONG).show();
 
-                }else {
+                } else {
+                    right = checkRight(username, editView.getText().toString());
+                    if (right == 1) {
+                        Thread mythread = new Thread(runnable2);
+                        mythread.start();
 
-                    Thread mythread = new Thread(runnable2);
-                    mythread.start();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                        }
 
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                    }
+                        latitude3 = "LatestLat = " + latitude2;
+                        longitude3 = "LatestLon = " + longitude2;
+                        currentSteps3 = "Steps: " + String.valueOf(currentSteps2);
+                        coins3 = "Coins: " + String.valueOf(coins2);
+                        hintNumber3 = "Hints: " + String.valueOf(hintNumber2);
 
-                    latitude3 = "LatestLat = " + latitude2;
-                    longitude3 = "LatestLon = " + longitude2;
-                    currentSteps3 = "Steps: " + String.valueOf(currentSteps2);
-                    coins3 = "Coins: " + String.valueOf(coins2);
-                    hintNumber3 = "Hints: " + String.valueOf(hintNumber2);
-
-                    if (exist == 1) {
-                        new AlertDialog.Builder(CloudActivity.this).setTitle(username2).setItems(
-                                new String[]{latitude3,longitude3,currentSteps3,coins3,hintNumber3}, null).setNegativeButton(
-                                "OK", null).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Player does not exist.", Toast.LENGTH_LONG).show();
+                        if (exist == 1) {
+                            new AlertDialog.Builder(CloudSecureActivity.this).setTitle(username2).setItems(
+                                    new String[]{latitude3, longitude3, currentSteps3, coins3, hintNumber3}, null).setNegativeButton(
+                                    "OK", null).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Player does not exist.", Toast.LENGTH_LONG).show();
+                        }
+                    }else{
+                        Toast.makeText(getApplicationContext(), "No access right!", Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -176,16 +174,25 @@ public class CloudActivity extends AppCompatActivity {
             };
         };
 
-/*        runnable2 = new Runnable() {
+        checkAutho = new Runnable() {
             public void run() {
-                SpotLocationsDO loadSpot = mapper.load(SpotLocationsDO.class,"花園神社");
-                content = loadSpot.getName();
+                UserDataStorageDO loadUserdata = mapper.load(UserDataStorageDO.class,username);
+                authorization = loadUserdata.getAuthorization();
+
             };
-        };*/
+        };
+
+        Thread mythread = new Thread(checkAutho);
+        mythread.start();
+
+    }
 
 
-
-
-
+    private int checkRight(String name, String checkedName){
+        if (authorization == 1||name.equals(checkedName)){
+            return 1;
+        }else {
+            return 0;
+        }
     }
 }

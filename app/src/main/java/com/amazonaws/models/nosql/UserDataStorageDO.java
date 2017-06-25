@@ -15,6 +15,7 @@ import java.util.Set;
 
 public class UserDataStorageDO {
     private String _userName;
+    private int _authorization;
     private int _coins;
     private Double _latestLatitude;
     private Double _latestLongitude;
@@ -30,6 +31,16 @@ public class UserDataStorageDO {
     public void setUserName(final String _userName) {
         this._userName = _userName;
     }
+
+    @DynamoDBAttribute(attributeName = "authorization")
+    public int getAuthorization() {
+        return _authorization;
+    }
+
+    public void setAuthorization(final int _authorization) {
+        this._authorization = _authorization;
+    }
+
     @DynamoDBAttribute(attributeName = "coins")
     public int getCoins() {
         return _coins;

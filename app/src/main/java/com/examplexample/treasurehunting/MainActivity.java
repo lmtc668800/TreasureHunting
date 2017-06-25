@@ -171,6 +171,7 @@ public class MainActivity extends AppCompatActivity
     int unlockedGame = 0;
     int coins=0;
     int stage=0;
+    int demoType;
     int destination = 0;
     int totalSpotNumber = 0;
     String username;
@@ -236,6 +237,7 @@ public class MainActivity extends AppCompatActivity
         unlockedGame = bundle.getInt("unlockedGame");
         stage = bundle.getInt("stage");
         username = bundle.getString("username");
+        demoType = bundle.getInt("DemoType");
 
         switch (stage){
             case 0:
@@ -307,7 +309,7 @@ public class MainActivity extends AppCompatActivity
                             double distance;
                             distance = loC.distance(latitude, longitude, startPoint.latitude, startPoint.longitude, "K");
 //                          start distance changed
-                            if (distance<= 100.040){
+                            if (distance<= 1000.040){
                                 startNewGame();
                             }else{
                                 Toast.makeText(getApplicationContext(), "Please start at the circle area in the map.", Toast.LENGTH_LONG).show();
@@ -360,12 +362,16 @@ public class MainActivity extends AppCompatActivity
                                                 }
                                             }
                                             else if (which == 1) {
-                                                scan_range = scan_range + 10;
+                                                scan_range = scan_range + 1000;
                                             } else if (which == 2){
                                                 scan_range = 0.060;
                                             }else if (which == 3){
                                                 Intent intent = new Intent();
-                                                intent.setClass(MainActivity.this, CloudActivity.class);
+                                                if (demoType == 1) {
+                                                    intent.setClass(MainActivity.this, CloudActivity.class);
+                                                }else{
+                                                    intent.setClass(MainActivity.this,CloudSecureActivity.class);
+                                                }
 
                                                 Bundle bundle=new Bundle();
                                                 bundle.putString("username",username);
@@ -409,6 +415,7 @@ public class MainActivity extends AppCompatActivity
                                         bundle.putInt("coins",coins);
                                         bundle.putInt("unlockedGame", unlockedGame);
                                         bundle.putString("username",username);
+                                        bundle.putInt("DemoType", 1);
                                         intent.putExtras(bundle);
 
                                         startActivity(intent);
@@ -566,8 +573,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onMyLocationButtonClick() {
-
-//        Toast.makeText(getApplicationContext(), gameData2.get(41).description, Toast.LENGTH_LONG).show();
 
         double distance;
         gps = new GPSTracker(MainActivity.this);
